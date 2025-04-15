@@ -14,27 +14,51 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: "integer")]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(type: "string", length: 255, unique: true)]
+    private ?string $username = null;
+
+    #[ORM\Column(type: "string", length: 255, unique : true)]
     private ?string $email = null;
 
-    /**
-     * @var list<string> The user roles
-     */
-    #[ORM\Column]
-    private array $roles = [];
-
-    /**
-     * @var string The hashed password
-     */
-    #[ORM\Column]
+    #[ORM\Column(type: "string", length: 255)]
     private ?string $password = null;
+
+    #[ORM\Column(type: "datetime_immutable")]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(type: "datetime", nullable: true)]
+    private ?\DateTimeInterface $lastConnection = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private Role $role;
+
+    #[ORM\Column(type: "string", length: 255, nullable:true)]
+    private ?string $avatarUrl = null;
+
+    #[ORM\Column(type:"boolean")]
+    private ?bool $active = null;
+
+    // ⚠️ This field is not persisted to the database.
+    private ?string $plainPassword = null;
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
+    // Getters
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUsername(): string
+    {
+        return (string) $this->username;
     }
 
     public function getEmail(): ?string
@@ -42,12 +66,99 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getLastConnection() : ?\DateTimeInterface
+    {
+        return $this->lastConnection;
+    }
+
+    public function getRole(): Role
+    {
+        return $this->role;
+    }
+
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatarUrl;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function isActive(): ?bool
+    {
+        return $this->active;
+    }
+
+    //Setters
+
     public function setEmail(string $email): static
     {
         $this->email = $email;
 
         return $this;
     }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function setUsername(string $username): static
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt= $createdAt;
+        return $this;
+    }
+    public function setLastConnection(\DateTimeInterface $lastConnection): static
+    {
+        $this->lastConnection = $lastConnection;
+        return $this;
+    }
+
+    public function setRole(Role $role): static
+    {
+        $this->role = $role;
+        return $this;
+    }
+
+    public function setAvatarUrl(?string $avatarUrl): static
+    {
+        $this->avatarUrl = $avatarUrl;
+        return $this;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
+        return $this;
+    }
+
+    public function setPlainPassword(?string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+        return $this;
+    }
+
+    // UserInterface Methods / PasswordAuthenticatedUserInterface
 
     /**
      * A visual identifier that represents this user.
@@ -61,49 +172,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @see UserInterface
-     *
-     * @return list<string>
-     */
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    /**
-     * @param list<string> $roles
-     */
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): static
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    /**
-     * @see UserInterface
      */
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+
+        $this->plainPassword = null;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = [$this->role->getName()];
+
+        //guarantee every user at least has ROLE_USER
+        $roles[] = "ROLE_USER";
+
+        return array_unique($roles);
     }
 }
