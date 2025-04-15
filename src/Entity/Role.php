@@ -20,6 +20,8 @@ class Role
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    // Getters
+
     public function getId(): ?int
     {
         return $this->id;
@@ -30,16 +32,18 @@ class Role
         return $this->name;
     }
 
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    // Setters
+
     public function setName(string $name): static
     {
         $this->name = $name;
 
         return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
     }
 
     public function setDescription(?string $description): static
