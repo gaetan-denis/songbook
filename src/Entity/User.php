@@ -47,6 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->active = true;
     }
 
     // Getters
@@ -128,7 +129,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->createdAt= $createdAt;
         return $this;
     }
-    public function setLastConnection(\DateTimeInterface $lastConnection): static
+    public function setLastConnection(?\DateTimeInterface $lastConnection): static
     {
         $this->lastConnection = $lastConnection;
         return $this;
@@ -192,5 +193,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles[] = "ROLE_USER";
 
         return array_unique($roles);
+    }
+
+    public function setRoles(array $array)
+    {
     }
 }

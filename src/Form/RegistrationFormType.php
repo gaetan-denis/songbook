@@ -4,8 +4,10 @@ namespace App\Form;
 
 use App\Entity\Role;
 use App\Entity\User;
+use phpDocumentor\Reflection\Type;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -16,18 +18,9 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('username')
             ->add('email')
-            ->add('password')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('lastConnection', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('avatarUrl')
-            ->add('active')
-            ->add('role', EntityType::class, [
-                'class' => Role::class,
-                'choice_label' => 'id',
+            ->add('plainPassword', PasswordType::class, [
+                'mapped'=>false,
+                'label' => "password"
             ])
         ;
     }
