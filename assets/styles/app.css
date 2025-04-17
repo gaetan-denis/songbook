@@ -1,3 +1,49 @@
 body {
-    background-color: skyblue;
+    background-color: grey;
+    background-image: url("../images/pexels-pixabay-290660.jpg");
+    color : whitesmoke;
+}
+
+/* Style de base pour la navbar */
+nav {
+    background-color: #333;  /* Couleur de fond sombre */
+    color: white;            /* Texte blanc */
+    padding: 10px 20px;      /* Espacement autour du contenu */
+}
+
+/* Liste horizontale pour les éléments de navigation */
+nav ul {
+    list-style: none;        /* Supprimer les puces de la liste */
+    padding: 0;              /* Supprimer les marges internes */
+    margin: 0;               /* Supprimer les marges externes */
+    display: flex;           /* Utiliser Flexbox pour la mise en page horizontale */
+    justify-content: center; /* Centrer les éléments */
+}
+
+/* Style des éléments de la liste */
+nav ul li {
+    margin: 0 15px;  /* Ajouter de l'espace entre les éléments */
+}
+
+/* Style des liens dans la navbar */
+nav ul li a {
+    text-decoration: none;       /* Supprimer le soulignement des liens */
+    color: white;                /* Couleur du texte */
+    font-size: 16px;             /* Taille du texte */
+    font-weight: bold;           /* Mettre le texte en gras */
+    padding: 8px 15px;           /* Espacement autour du texte */
+    border-radius: 5px;          /* Coins arrondis */
+    transition: background-color 0.3s ease; /* Transition pour le survol */
+}
+
+/* Changer la couleur de fond au survol */
+nav ul li a:hover {
+    background-color: #555;      /* Fond gris clair au survol */
+    color: #fff;                 /* Maintenir le texte en blanc */
+}
+
+/* Style pour un lien actif */
+nav ul li a.active {
+    background-color: #007bff;   /* Fond bleu pour le lien actif */
+    color: white;                /* Texte blanc */
 }
