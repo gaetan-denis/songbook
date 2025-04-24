@@ -19,6 +19,8 @@
         "build": "encore production --progress"
     },
     "dependencies": {
-        "@symfony/stimulus-bundle": "^2.24.0"
+        "@popperjs/core": "^2.11.8",
+        "@symfony/stimulus-bundle": "^2.24.0",
+        "bootstrap": "^5.3.5"
     }
 }
