@@ -42,16 +42,25 @@ final class RegistrationController extends AbstractController
             if ($defaultRole) {
                 $user->setRole($defaultRole);
             } else {
-                // en cas de souci, tu peux lever une exception ou définir un rôle de secours
+                // En cas de souci, tu peux lever une exception ou définir un rôle de secours
                 throw new \Exception("Le rôle ROLE_USER n'existe pas en base.");
             }
 
+            // Vérification de l'unicité de l'email
             $userRepository = $entityManager->getRepository(User::class);
-            $existingUser = $userRepository->findOneBy(['email' => $user->getEmail()]);
+            $existingUserByEmail = $userRepository->findOneBy(['email' => $user->getEmail()]);
 
-            if ($existingUser) {
+            if ($existingUserByEmail) {
                 $this->addFlash('error', 'Cet email est déjà utilisé. Veuillez en choisir un autre.');
-                return $this->redirectToRoute('app_register'); // ou re-rendre le formulaire selon ton flux
+                return $this->redirectToRoute('app_register');
+            }
+
+            // Vérification de l'unicité du username
+            $existingUserByUsername = $userRepository->findOneBy(['username' => $user->getUsername()]);
+
+            if ($existingUserByUsername) {
+                $this->addFlash('error', 'Ce nom d\'utilisateur est déjà pris. Veuillez en choisir un autre.');
+                return $this->redirectToRoute('app_register');
             }
 
             // Enregistrement en base de données
@@ -67,4 +76,3 @@ final class RegistrationController extends AbstractController
         ]);
     }
 }
-
