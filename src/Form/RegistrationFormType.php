@@ -2,13 +2,12 @@
 
 namespace App\Form;
 
-use App\Entity\Role;
 use App\Entity\User;
-use phpDocumentor\Reflection\Type;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,8 +16,13 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('username')
-            ->add('email')
+            ->add('username', null, [
+                'label' => 'Nom d\'utilisateur',
+
+            ])
+            ->add('email', EmailType::class, [
+                'label' => 'Adresse e-mail',
+            ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'mapped' => false,
@@ -27,6 +31,9 @@ class RegistrationFormType extends AbstractType
                 'second_options' => ['label' => 'Confirmer le mot de passe'],
                 'invalid_message' => 'Les mots de passe doivent être identiques.',
                 'attr' => ['autocomplete' => 'new-password'],
+            ])
+            ->add('submit', SubmitType::class, [
+                'label' => 'S\'inscrire',
             ]);
     }
 
