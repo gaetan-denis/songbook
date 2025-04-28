@@ -46,6 +46,14 @@ final class RegistrationController extends AbstractController
                 throw new \Exception("Le rôle ROLE_USER n'existe pas en base.");
             }
 
+            $userRepository = $entityManager->getRepository(User::class);
+            $existingUser = $userRepository->findOneBy(['email' => $user->getEmail()]);
+
+            if ($existingUser) {
+                $this->addFlash('error', 'Cet email est déjà utilisé. Veuillez en choisir un autre.');
+                return $this->redirectToRoute('app_register'); // ou re-rendre le formulaire selon ton flux
+            }
+
             // Enregistrement en base de données
             $entityManager->persist($user);
             $entityManager->flush();
