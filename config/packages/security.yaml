@@ -20,6 +20,12 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+            remember_me:
+                secret: '%env(APP_SECRET)%'
+                lifetime: 604800 # Durée de vie du cookie (en secondes)
+                path: /
+                domain: ~ # Le domaine du cookie, peut être configuré selon ton besoin
+                always_remember_me: false
             logout:
                 path: app_logout
                 # where to redirect after logout
