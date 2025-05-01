@@ -3,6 +3,7 @@
 // AdminController.php
 namespace App\Controller;
 
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;  // Utilise Annotation pour la route
@@ -20,10 +21,13 @@ return $this->render('admin/index.html.twig');
 }
 
 #[Route('/admin/users', name: 'app_admin_users')]
-public function manageUsers(): Response
+public function manageUsers(UserRepository $userRepository): Response
 {
-// Logique pour récupérer et gérer les utilisateurs
-return $this->render('admin/users.html.twig');
+    $users = $userRepository->findAll();
+
+    return $this->render('admin/users.html.twig', [
+        'users' => $users,
+    ]);
 }
 
 #[Route('/admin/partitions', name: 'app_admin_partitions')]
