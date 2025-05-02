@@ -14,12 +14,8 @@ final class AdminController extends AbstractController
 #[Route('/admin', name: 'app_admin')]
 public function index(): Response
 {
-if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_MODERATOR')) {
-throw $this->createAccessDeniedException();
+    return $this->render('admin/index.html.twig');
 }
-return $this->render('admin/index.html.twig');
-}
-
 #[Route('/admin/users', name: 'app_admin_users')]
 public function manageUsers(UserRepository $userRepository): Response
 {
