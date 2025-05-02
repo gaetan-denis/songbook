@@ -19,7 +19,18 @@
                 <tr>
                     <td>{{ user.id }}</td>
                     <td>{{ user.email }}</td>
-                    <td>{{ user.roles|join(', ') }}</td>
+                    <td>
+                        {% set roleLabels = {
+                            'ROLE_ADMIN': 'Administrateur',
+                            'ROLE_MODERATOR': 'Modérateur'
+                        } %}
+                        {% set customRoles = user.roles|filter(role => role != 'ROLE_USER') %}
+                        {% if customRoles is not empty %}
+                            {{ customRoles|map(r => roleLabels[r] ?? r)|join(', ') }}
+                        {% else %}
+                            Utilisateur
+                        {% endif %}
+                    </td>
                 </tr>
             {% else %}
                 <tr>
