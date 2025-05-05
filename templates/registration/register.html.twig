@@ -11,23 +11,24 @@
             </div>
         {% endfor %}
     {% endfor %}
+
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <div class="card shadow-sm bg-dark text-white">
-                    <div class="card-header text-center bg-dark text-white">
-                        <h2>Inscription</h2>
+                <div class="card shadow-sm border-0">
+                    <div class="card-header text-center bg-light">
+                        <h2 class="mb-0">Inscription</h2>
                     </div>
-                    <div class="card-body bg-dark text-white">
+                    <div class="card-body">
                         {{ form_start(registrationForm) }}
-                        {{ form_row(registrationForm.username, {'attr': {'class': 'form-control bg-dark text-white border-light'}}) }}
-                        {{ form_row(registrationForm.email, {'attr': {'class': 'form-control bg-dark text-white border-light'}}) }}
-                        {{ form_row(registrationForm.plainPassword.first, {'attr': {'class': 'form-control bg-dark text-white border-light'}}) }}
-                        {{ form_row(registrationForm.plainPassword.second, {'attr': {'class': 'form-control bg-dark text-white border-light'}}) }}
-                        <div class="d-grid">
-                            {{ form_row(registrationForm.submit, {'attr': {'class': 'btn btn-light w-100'}}) }}
-                        </div>
+                        {{ form_row(registrationForm.username) }}
+                        {{ form_row(registrationForm.email) }}
+                        {{ form_row(registrationForm.plainPassword.first) }}
+                        {{ form_row(registrationForm.plainPassword.second) }}
 
+                        <div class="d-grid mt-3">
+                            {{ form_row(registrationForm.submit, {'attr': {'class': 'btn btn-dark w-100'}}) }}
+                        </div>
                         {{ form_end(registrationForm) }}
                     </div>
                 </div>
