@@ -4,11 +4,10 @@ namespace App\Form;
 
 use App\Entity\Role;
 use App\Entity\User;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,15 +18,19 @@ class UserType extends AbstractType
         $builder
             ->add('username', TextType::class)
             ->add('email', EmailType::class)
-            ->add('roles', ChoiceType::class, [
-                'choices' => [
-                    'Utilisateur' => 'ROLE_USER',
-                    'Modérateur' => 'ROLE_MODERATOR',
-                    'Administrateur' => 'ROLE_ADMIN',
-                    ],
-                'expanded' => true,
-                'multiple' => true,
-                'label' => 'Roles',
+            ->add('role', EntityType::class, [
+                'class' => Role::class,
+                'choice_label' => function ($role) {
+                    return match($role->getName()) {
+                        'ROLE_ADMIN' => 'Administrateur',
+                        'ROLE_USER' => 'Utilisateur',
+                        'ROLE_MODERATOR' => 'Modérateur',
+                        default => $role->getName(),
+                    };
+                },
+                'label' => 'Rôle',
+                'placeholder' => 'Sélectionnez un rôle',
+                'required' => true,
             ]);
     }
 

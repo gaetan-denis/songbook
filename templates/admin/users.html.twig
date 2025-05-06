@@ -17,22 +17,19 @@
             </tr>
             </thead>
             <tbody>
+            {% set roleLabels = {
+                'ROLE_ADMIN': 'Administrateur',
+                'ROLE_MODERATOR': 'Modérateur',
+                'ROLE_USER': 'Utilisateur'
+            } %}
+
             {% for user in users %}
                 <tr>
                     <td>{{ user.id }}</td>
                     <td>{{ user.username }}</td>
                     <td>{{ user.email }}</td>
                     <td>
-                        {% set roleLabels = {
-                            'ROLE_ADMIN': 'Administrateur',
-                            'ROLE_MODERATOR': 'Modérateur'
-                        } %}
-                        {% set customRoles = user.roles|filter(role => role != 'ROLE_USER') %}
-                        {% if customRoles is not empty %}
-                            {{ customRoles|map(r => roleLabels[r] ?? r)|join(', ') }}
-                        {% else %}
-                            Utilisateur
-                        {% endif %}
+                        {{ roleLabels[user.role.name] ?? user.role.name }}
                     </td>
                     <td>
                         <a href="{{ path('user_edit', {'id': user.id}) }}" class="btn btn-sm btn-dark">Modifier</a>
@@ -40,7 +37,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="3">Aucun utilisateur trouvé.</td>
+                    <td colspan="5">Aucun utilisateur trouvé.</td>
                 </tr>
             {% endfor %}
             </tbody>

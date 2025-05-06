@@ -23,8 +23,19 @@
                         </div>
 
                         <div class="mb-3">
-                            {{ form_label(form.roles) }}
-                            {{ form_widget(form.roles) }}
+                            {{ form_label(form.role) }}
+                            {{ form_widget(form.role) }}
+
+                            {# Affichage du rôle actuel sous forme lisible #}
+                            <small class="form-text text-muted">
+                                Rôle actuel :
+                                {% set roleName = {
+                                    'ROLE_ADMIN': 'Administrateur',
+                                    'ROLE_USER': 'Utilisateur',
+                                    'ROLE_MODERATOR': 'Modérateur'
+                                }[user.role.name] ?? user.role.name %}
+                                <strong>{{ roleName }}</strong>
+                            </small>
                         </div>
 
                         <div class="d-flex justify-content-between mt-4">
