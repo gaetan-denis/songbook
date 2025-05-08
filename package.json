@@ -20,8 +20,10 @@
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^6.7.2",
+        "@hotwired/stimulus": "^3.2.2",
+        "@hotwired/stimulus-webpack-helpers": "^1.0.1",
         "@popperjs/core": "^2.11.8",
-        "@symfony/stimulus-bundle": "^2.24.0",
-        "bootstrap": "^5.3.5"
+        "bootstrap": "^5.3.5",
+        "stimulus": "^3.2.2"
     }
 }
