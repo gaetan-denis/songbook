@@ -48,6 +48,19 @@ final class AdminController extends AbstractController
     #[Route('/admin/user/{id}/edit', name: 'user_edit')]
     public function edit(User $user, Request $request, EntityManagerInterface $em): Response
     {
+        $currentUser = $this->getUser(); // Utilisateur connecté
+
+        // Empêcher les modérateurs de modifier d'autres modérateurs ou admins
+        if (in_array('ROLE_MODERATOR', $currentUser->getRoles(), true)) {
+            if (
+                in_array('ROLE_ADMIN', $user->getRoles(), true) ||
+                in_array('ROLE_MODERATOR', $user->getRoles(), true)
+            ) {
+                $this->addFlash('error', 'Vous ne pouvez pas modifier cet utilisateur.');
+                return $this->redirectToRoute('app_admin_users');
+            }
+        }
+
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
