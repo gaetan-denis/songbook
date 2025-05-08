@@ -11900,6 +11900,10 @@ textarea.form-control-lg {
 body {
   background-color: grey;
   background-image: url("../images/pexels-pixabay-290660.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
   color: whitesmoke;
 }
 
