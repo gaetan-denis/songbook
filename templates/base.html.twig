@@ -10,10 +10,18 @@
     {% endblock %}
 </head>
 <body>
-{% include '_partials/navbar.html.twig' %}
-{% block body %}{% endblock %}
+<div class="page-container">
+    {% include '_partials/navbar.html.twig' %}
+
+    <main class="content-wrap">
+        {% block body %}{% endblock %}
+    </main>
+
+    {% include '_partials/footer.html.twig' %}
+</div>
+
 {% block javascripts %}
-    {{ encore_entry_script_tags('app') }}  {# Inclut les scripts générés par Webpack Encore #}
+    {{ encore_entry_script_tags('app') }}
 {% endblock %}
 </body>
 </html>
