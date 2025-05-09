@@ -121,7 +121,7 @@ final class AdminController extends AbstractController
             throw $this->createAccessDeniedException('Vous devez être connecté.');
         }
 
-        // Vérification de sécurité comme pour edit
+        // Vérification de sécurité : les modérateurs ne peuvent pas bannir les admins ou les autres modérateurs
         if (in_array('ROLE_MODERATOR', $currentUser->getRoles(), true)) {
             if (
                 in_array('ROLE_ADMIN', $user->getRoles(), true) ||
@@ -132,11 +132,16 @@ final class AdminController extends AbstractController
             }
         }
 
-        $user->setIsBanned(true); // Il faut que l'entité ait ce champ
+        // On inverse l'état de bannissement
+        $user->setIsBanned(!$user->getIsBanned());
         $em->flush();
 
-        $this->addFlash('success', 'Utilisateur banni avec succès.');
+        // Flash message en fonction de l'état de bannissement
+        $this->addFlash(
+            'success',
+            $user->getIsBanned() ? 'Utilisateur banni avec succès.' : 'Utilisateur rétabli avec succès.'
+        );
+
         return $this->redirectToRoute('app_admin_users');
     }
-
 }

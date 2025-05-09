@@ -55,6 +55,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->active = true;
     }
 
+    #[ORM\Column(type: 'boolean')]
+    private $isBanned = false;  // Par défaut, l'utilisateur n'est pas banni
+
     // Getters
 
     public function getId(): ?int
@@ -105,6 +108,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isActive(): ?bool
     {
         return $this->active;
+    }
+
+    public function getIsBanned(): ?bool
+    {
+        return $this->isBanned;
     }
 
     //Setters
@@ -161,6 +169,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(?string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+        return $this;
+    }
+
+    public function setIsBanned(bool $isBanned): self
+    {
+        $this->isBanned = $isBanned;
+
         return $this;
     }
 
