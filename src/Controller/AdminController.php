@@ -83,7 +83,14 @@ final class AdminController extends AbstractController
     #[Route('/admin/user/{id}/delete', name: 'user_delete', methods: ['POST'])]
     public function delete(User $user, Request $request, EntityManagerInterface $em): Response
     {
+
         $currentUser = $this->getUser();
+
+        // Un utilisateur ne peut pas se bannir lui-même (admin ou modérateur)
+        if ($user === $currentUser) {
+            $this->addFlash('error', 'Vous ne pouvez pas vous bannir vous-même.');
+            return $this->redirectToRoute('app_admin_users');
+        }
 
         if (!$currentUser) {
             throw $this->createAccessDeniedException('Vous devez être connecté.');
@@ -116,6 +123,12 @@ final class AdminController extends AbstractController
     public function ban(User $user, EntityManagerInterface $em): Response
     {
         $currentUser = $this->getUser();
+
+        // Un utilisateur ne peut pas se supprimer lui-même (admin ou modérateur)
+        if ($user === $currentUser) {
+            $this->addFlash('error', 'Vous ne pouvez pas vous supprimer vous-même.');
+            return $this->redirectToRoute('app_admin_users');
+        }
 
         if (!$currentUser) {
             throw $this->createAccessDeniedException('Vous devez être connecté.');

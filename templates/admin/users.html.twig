@@ -3,6 +3,13 @@
 {% block title %}Gestion des utilisateurs{% endblock %}
 
 {% block body %}
+    {% set currentUser = app.user %}
+    {% set roleLabels = {
+        'ROLE_ADMIN': 'Administrateur',
+        'ROLE_MODERATOR': 'Modérateur',
+        'ROLE_USER': 'Utilisateur'
+    } %}
+
     <div class="container mt-4">
         <h1>Liste des utilisateurs</h1>
 
@@ -27,20 +34,12 @@
             </tr>
             </thead>
             <tbody>
-            {% set roleLabels = {
-                'ROLE_ADMIN': 'Administrateur',
-                'ROLE_MODERATOR': 'Modérateur',
-                'ROLE_USER': 'Utilisateur'
-            } %}
-
             {% for user in users %}
                 <tr>
                     <td>{{ user.id }}</td>
                     <td>{{ user.username }}</td>
                     <td>{{ user.email }}</td>
-                    <td>
-                        {{ roleLabels[user.role.name] ?? user.role.name }}
-                    </td>
+                    <td>{{ roleLabels[user.role.name] ?? user.role.name }}</td>
                     <td>
                         {% if user.isBanned %}
                             <span class="text-danger">Banni</span>
@@ -49,32 +48,42 @@
                         {% endif %}
                     </td>
                     <td class="d-flex gap-1">
-                        {# Modifier #}
-                        <a href="{{ path('user_edit', {'id': user.id}) }}" class="btn btn-sm btn-dark" title="Modifier">
+                        <a href="{{ path('user_edit', {'id': user.id}) }}"
+                           class="btn btn-sm btn-dark"
+                           title="Modifier">
                             <i class="fa-solid fa-pen"></i>
                         </a>
 
-                        {# Supprimer #}
-                        <form method="post" action="{{ path('user_delete', {'id': user.id}) }}"
-                              onsubmit="return confirm('⚠️ Es-tu sûr de vouloir supprimer {{ user.username }} ? Cette action est irréversible.');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete-user-' ~ user.id) }}">
-                            <button class="btn btn-sm btn-dark" title="Supprimer">
+                        {% if user != currentUser %}
+                            <form method="post"
+                                  action="{{ path('user_delete', {'id': user.id}) }}"
+                                  onsubmit="return confirm('⚠️ Supprimer {{ user.username }} ? Action irréversible.');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete-user-' ~ user.id) }}">
+                                <button class="btn btn-sm btn-dark" title="Supprimer">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+
+                            <form method="post"
+                                  action="{{ path('user_ban', {'id': user.id}) }}"
+                                  onsubmit="return confirm('{{ user.isBanned ? 'Réactiver' : 'Bannir' }} {{ user.username }} ?');">
+                                <button class="btn btn-sm btn-dark" title="{{ user.isBanned ? 'Réactiver' : 'Bannir' }}">
+                                    <i class="fa-solid fa-ban"></i> {{ user.isBanned ? 'Réactiver' : 'Bannir' }}
+                                </button>
+                            </form>
+                        {% else %}
+                            <button class="btn btn-sm btn-secondary" disabled title="Action désactivée">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
-                        </form>
-
-                        {# Bannir / Réactiver #}
-                        <form method="post" action="{{ path('user_ban', {'id': user.id}) }}"
-                              onsubmit="return confirm('{{ user.isBanned ? 'Réactiver' : 'Bannir' }} {{ user.username }} ?');">
-                            <button class="btn btn-sm btn-dark" title="{{ user.isBanned ? 'Réactiver' : 'Bannir' }}">
-                                <i class="fa-solid fa-ban"></i> {{ user.isBanned ? 'Réactiver' : 'Bannir' }}
+                            <button class="btn btn-sm btn-secondary" disabled title="Action désactivée">
+                                <i class="fa-solid fa-ban"></i> Bannir
                             </button>
-                        </form>
+                        {% endif %}
                     </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6">Aucun utilisateur trouvé.</td>
+                    <td colspan="6" class="text-center">Aucun utilisateur trouvé.</td>
                 </tr>
             {% endfor %}
             </tbody>
