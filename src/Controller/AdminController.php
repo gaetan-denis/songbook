@@ -50,6 +50,10 @@ final class AdminController extends AbstractController
     {
         $currentUser = $this->getUser(); // Utilisateur connecté
 
+        if (!$currentUser) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
+
         // Empêcher les modérateurs de modifier d'autres modérateurs ou admins
         if (in_array('ROLE_MODERATOR', $currentUser->getRoles(), true)) {
             if (
@@ -76,4 +80,63 @@ final class AdminController extends AbstractController
             'user' => $user,
         ]);
     }
+    #[Route('/admin/user/{id}/delete', name: 'user_delete', methods: ['POST'])]
+    public function delete(User $user, Request $request, EntityManagerInterface $em): Response
+    {
+        $currentUser = $this->getUser();
+
+        if (!$currentUser) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
+
+        // Vérification de sécurité
+        if (in_array('ROLE_MODERATOR', $currentUser->getRoles(), true)) {
+            if (
+                in_array('ROLE_ADMIN', $user->getRoles(), true) ||
+                in_array('ROLE_MODERATOR', $user->getRoles(), true)
+            ) {
+                $this->addFlash('error', 'Vous ne pouvez pas supprimer cet utilisateur.');
+                return $this->redirectToRoute('app_admin_users');
+            }
+        }
+
+        // Vérification du token CSRF
+        if ($this->isCsrfTokenValid('delete-user-' . $user->getId(), $request->request->get('_token'))) {
+            $em->remove($user);
+            $em->flush();
+
+            $this->addFlash('success', 'Utilisateur supprimé avec succès.');
+        } else {
+            $this->addFlash('error', 'Token CSRF invalide.');
+        }
+
+        return $this->redirectToRoute('app_admin_users');
+    }
+    #[Route('/admin/user/{id}/ban', name: 'user_ban', methods: ['POST'])]
+    public function ban(User $user, EntityManagerInterface $em): Response
+    {
+        $currentUser = $this->getUser();
+
+        if (!$currentUser) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
+
+        // Vérification de sécurité comme pour edit
+        if (in_array('ROLE_MODERATOR', $currentUser->getRoles(), true)) {
+            if (
+                in_array('ROLE_ADMIN', $user->getRoles(), true) ||
+                in_array('ROLE_MODERATOR', $user->getRoles(), true)
+            ) {
+                $this->addFlash('error', 'Vous ne pouvez pas bannir cet utilisateur.');
+                return $this->redirectToRoute('app_admin_users');
+            }
+        }
+
+        $user->setIsBanned(true); // Il faut que l'entité ait ce champ
+        $em->flush();
+
+        $this->addFlash('success', 'Utilisateur banni avec succès.');
+        return $this->redirectToRoute('app_admin_users');
+    }
+
 }
