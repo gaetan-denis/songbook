@@ -1,11 +1,38 @@
 @import "reset";
 @import "../../node_modules/bootstrap/scss/bootstrap";
+@import "~@fortawesome/fontawesome-free/css/all.min.css";
 
 
 body {
     background-color: grey;
     background-image: url("../images/pexels-pixabay-290660.jpg");
+    background-size: cover;
+
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
     color : whitesmoke;
+}
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* 100% de la hauteur de la fenêtre */
+}
+
+.content-wrap {
+    flex: 1; /* Pousse le footer vers le bas */
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1em;
 }
 
 /* Style de base pour la navbar */

@@ -6,16 +6,16 @@
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <div class="card shadow-sm bg-dark text-white">
-                    <div class="card-header text-center bg-dark text-white">
-                        <h2>Mon Profil</h2>
+                <div class="card shadow-sm border-0">
+                    <div class="card-header text-center bg-light">
+                        <h2 class="mb-0">Mon Profil</h2>
                     </div>
                     <div class="card-body">
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item bg-dark text-white border-light">Nom d'utilisateur : {{ user.username }}</li>
-                            <li class="list-group-item bg-dark text-white border-light">Adresse email : {{ user.email }}</li>
-                            <li class="list-group-item bg-dark text-white border-light">Date de création du compte : {{ user.createdAt|date('d/m/Y') }}</li>
-                            <li class="list-group-item bg-dark text-white border-light">Statut : {{ role }}</li>
+                            <li class="list-group-item">Nom d'utilisateur : {{ user.username }}</li>
+                            <li class="list-group-item">Adresse email : {{ user.email }}</li>
+                            <li class="list-group-item">Date de création du compte : {{ user.createdAt|date('d/m/Y') }}</li>
+                            <li class="list-group-item">Statut : {{ role }}</li>
                         </ul>
                     </div>
                 </div>
@@ -23,4 +23,3 @@
         </div>
     </div>
 {% endblock %}
-
