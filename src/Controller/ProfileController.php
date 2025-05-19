@@ -6,6 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Entity\User;
+use App\Form\EditProfileType;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 final class ProfileController extends AbstractController
 {
@@ -38,6 +43,30 @@ final class ProfileController extends AbstractController
         return $this->render('profile/index.html.twig', [
             'role' => $roleLabel,  // Passer le rôle sous forme de label
             'user' => $user,
+        ]);
+    }
+    #[Route('/profile/edit', name: 'app_profile_edit')]
+    public function edit(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $form = $this->createForm(EditProfileType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $plainPassword = $form->get('plainPassword')->getData();
+            if ($plainPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
+                $user->setPassword($hashedPassword);
+            }
+
+            $em->flush();
+            $this->addFlash('success', 'Profil mis à jour.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        return $this->render('profile/edit.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 }
