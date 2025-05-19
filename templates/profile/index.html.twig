@@ -11,11 +11,37 @@
                         <h2 class="mb-0">Mon Profil</h2>
                     </div>
                     <div class="card-body">
+                        <h5 class="card-title mb-2">Informations personnelles</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item">
+                                <strong>Nom d'utilisateur :</strong> {{ user.username }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Adresse email :</strong> {{ user.email }}
+                            </li>
+                        </ul>
+
+                        <h5 class="card-title mb-2">Informations d'inscription</h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item">
+                                <strong>Créé le :</strong> {{ user.createdAt|date('d/m/Y') }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Conditions acceptées le :</strong>
+                                {% if user.termsAcceptedAt %}
+                                    {{ user.termsAcceptedAt|date('d/m/Y à H:i') }}
+                                {% else %}
+                                    <span class="text-muted">Non spécifié</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+
+                        <h5 class="card-title mb-2">Statut</h5>
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Nom d'utilisateur : {{ user.username }}</li>
-                            <li class="list-group-item">Adresse email : {{ user.email }}</li>
-                            <li class="list-group-item">Date de création du compte : {{ user.createdAt|date('d/m/Y') }}</li>
-                            <li class="list-group-item">Statut : {{ role }}</li>
+                            <li class="list-group-item">
+                                <strong>Rôle :</strong>
+                                <span class="badge bg-primary">{{ role }}</span>
+                            </li>
                         </ul>
                     </div>
                 </div>

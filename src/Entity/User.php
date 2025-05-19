@@ -58,6 +58,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private $isBanned = false;  // Par défaut, l'utilisateur n'est pas banni
 
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $termsAcceptedAt = null;
+
     // Getters
 
     public function getId(): ?int
@@ -113,6 +116,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getIsBanned(): ?bool
     {
         return $this->isBanned;
+    }
+
+    public function getTermsAcceptedAt(): ?\DateTimeInterface
+    {
+        return $this->termsAcceptedAt;
     }
 
     //Setters
@@ -176,6 +184,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->isBanned = $isBanned;
 
+        return $this;
+    }
+
+    public function setTermsAcceptedAt(?\DateTimeInterface $termsAcceptedAt): self
+    {
+        $this->termsAcceptedAt = $termsAcceptedAt;
         return $this;
     }
 

@@ -63,6 +63,8 @@ final class RegistrationController extends AbstractController
                 return $this->redirectToRoute('app_register');
             }
 
+            $user->setTermsAcceptedAt(new \DateTimeImmutable());
+
             // Enregistrement en base de données
             $entityManager->persist($user);
             $entityManager->flush();
