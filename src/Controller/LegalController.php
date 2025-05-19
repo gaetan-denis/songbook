@@ -32,4 +32,9 @@ final class LegalController extends AbstractController
             'contact_email' => $params->get('legal.contact_email'),
         ]);
     }
+    #[Route('/term_of_use', name: 'app_term_of_use')]
+    public function terms(): Response
+    {
+        return $this->render('legal/terms_of_use.html.twig');
+    }
 }
