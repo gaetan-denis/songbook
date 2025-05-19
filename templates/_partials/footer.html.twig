@@ -1,3 +1,10 @@
-<footer class="bg-dark text-white text-center py-4">
-    <p>&copy; {{ "now"|date("Y") }} Songbook. Tous droits réservés.</p>
+<footer class="bg-dark text-white text-center py-4 mt-5">
+    <div class="container">
+        <p class="mb-2">&copy; {{ "now"|date("Y") }} TonSite. Tous droits réservés.</p>
+        <div>
+            <a href="{{ path('app_privacy_policy') }}" class="text-white mx-2 text-decoration-underline">Politique de confidentialité</a>
+            |
+            <a href="{{ path('app_legal_notice') }}" class="text-white mx-2 text-decoration-underline">Mentions légales</a>
+        </div>
+    </div>
 </footer>

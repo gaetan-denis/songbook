@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Politique de Confidentialité{% endblock %}
+
+{% block body %}
+    <div class="container my-5">
+        <div class="mx-auto p-5 rounded bg-dark text-light shadow" style="max-width: 800px;">
+            <h1 class="mb-4 text-center">Politique de confidentialité</h1>
+
+            <p class="text-end text-muted">Dernière mise à jour : {{ "now"|date("d/m/Y") }}</p>
+
+            <h2 class="mt-4">Données collectées</h2>
+            <ul class="list-group list-group-flush mb-4">
+                <li class="list-group-item bg-dark text-light border-secondary">Nom d’utilisateur (username)</li>
+                <li class="list-group-item bg-dark text-light border-secondary">Email</li>
+                <li class="list-group-item bg-dark text-light border-secondary">Mot de passe (chiffré)</li>
+                <li class="list-group-item bg-dark text-light border-secondary">Date d’inscription et de dernière connexion</li>
+                <li class="list-group-item bg-dark text-light border-secondary">Avatar (facultatif)</li>
+                <li class="list-group-item bg-dark text-light border-secondary">Rôle et statut</li>
+            </ul>
+
+            <h2>Utilisation des données</h2>
+            <p>Ces données sont utilisées uniquement pour vous permettre d’accéder à nos services, sécuriser l’accès, et personnaliser votre expérience.</p>
+
+            <h2>Suppression des données</h2>
+            <p>Vous pouvez supprimer votre compte à tout moment depuis votre profil. Toutes vos données seront définitivement supprimées de notre base de données.</p>
+
+            <h2>Export</h2>
+            <p>Vous pouvez demander un export de vos données personnelles à tout moment.</p>
+
+            <h2>Contact</h2>
+            <p>Pour toute question : <a href="mailto:dpo@example.com" class="text-info">dpo@example.com</a></p>
+        </div>
+    </div>
+{% endblock %}

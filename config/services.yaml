@@ -1,4 +1,7 @@
 parameters:
+    legal.owner_name: '%env(LEGAL_OWNER_NAME)%'
+    legal.owner_address: '%env(LEGAL_OWNER_ADDRESS)%'
+    legal.contact_email: '%env(LEGAL_CONTACT_EMAIL)%'
 
 services:
     _defaults:
