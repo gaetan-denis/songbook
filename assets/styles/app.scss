@@ -78,3 +78,13 @@ nav ul li a.active {
     background-color: #007bff;   /* Fond bleu pour le lien actif */
     color: white;                /* Texte blanc */
 }
+
+/* Style pour l'avatar dans la navbar */
+nav .nav-link img.rounded-circle {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    margin-right: 8px;  // espace entre l'image et le nom d'utilisateur
+    vertical-align: middle;
+    display: inline-block;
+}
