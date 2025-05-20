@@ -54,16 +54,10 @@ final class ProfileController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Récupération du mot de passe s’il a été modifié
             $plainPassword = $form->get('plainPassword')->getData();
-            $confirmPassword = $form->get('confirmPassword')->getData();
 
-            // Vérifie que les mots de passe correspondent si un mot de passe est soumis
-            if ($plainPassword && $plainPassword !== $confirmPassword) {
-                $this->addFlash('error', 'Les mots de passe ne correspondent pas.');
-                return $this->redirectToRoute('app_profile_edit');
-            }
-
-            if ($plainPassword) {
+            if (!empty($plainPassword)) {
                 $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
                 $user->setPassword($hashedPassword);
             }
@@ -77,5 +71,6 @@ final class ProfileController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
 }
 

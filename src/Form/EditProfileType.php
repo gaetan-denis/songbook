@@ -46,11 +46,7 @@ class EditProfileType extends AbstractType
             ->add('avatarUrl', TextType::class, [
                 'label' => 'URL de l’avatar',
                 'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Mettre à jour mes informations',
-                'attr' => ['class' => 'btn btn-primary mt-3']
-            ]);
+                ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
