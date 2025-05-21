@@ -11,6 +11,7 @@ use App\Form\EditProfileType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 final class ProfileController extends AbstractController
 {
@@ -70,6 +71,42 @@ final class ProfileController extends AbstractController
         return $this->render('profile/edit.html.twig', [
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/profile/export', name: 'app_profile_export')]
+    #[IsGranted("ROLE_USER")]
+    public function export(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        // Exemple de structure des données à exporter
+        $data = [
+            'id' => $user->getId(),
+            'email' => $user->getEmail(),
+            'username' => $user->getUsername(), // Plutôt que getUserIdentifier()
+            'roles' => $user->getRoles(),
+            'created_at' => $user->getCreatedAt()?->format('Y-m-d H:i:s'),
+            'last_connection' => $user->getLastConnection()?->format('Y-m-d H:i:s'),
+            'avatar_url' => $user->getAvatarUrl(),
+            'is_active' => $user->isActive(),
+            'is_banned' => $user->getIsBanned(),
+            'terms_accepted_at' => $user->getTermsAcceptedAt()?->format('Y-m-d H:i:s'),
+        ];
+
+        // Encodage en JSON
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        // Création de la réponse en pièce jointe
+        $response = new Response($json);
+        $disposition = $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            'my_data_export.json'
+        );
+        $response->headers->set('Content-Disposition', $disposition);
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
 }
