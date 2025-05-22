@@ -34,7 +34,7 @@
                 <li class="list-group-item">
                     <strong>Dernière connexion :</strong>
                     {% if user.lastConnection %}
-                        {{ user.lastConnection|date('d/m/Y à H:i', 'Europe/Brusselsgfit ') }}
+                        {{ user.lastConnection|date('d/m/Y à H:i', 'Europe/Brussels') }}
                     {% else %}
                         Jamais connecté
                     {% endif %}
