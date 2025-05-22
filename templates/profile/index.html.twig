@@ -71,6 +71,10 @@
                         <a href="{{ path('app_profile_export') }}" class="btn btn-outline-primary">
                             📄 Exporter mes données
                         </a>
+                        <form method="post" action="{{ path('app_profile_delete') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre compte ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
+                            <button class="btn btn-danger">Supprimer mon compte</button>
+                        </form>
                     </div>
                 </div>
             </div>

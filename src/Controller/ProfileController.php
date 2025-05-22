@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\User;
 use App\Form\EditProfileType;
@@ -12,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Security\Csrf\CsrfToken;
 
 final class ProfileController extends AbstractController
 {
@@ -108,6 +112,23 @@ final class ProfileController extends AbstractController
 
         return $response;
     }
+
+    #[Route('/profile/delete', name: 'app_profile_delete', methods: ['POST'])]
+    #[IsGranted("ROLE_USER")]
+    public function deleteUser(
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $passwordHasher,
+        Security $security
+    ): Response {
+        $user = $security->getUser();
+        $hashedPassword = $passwordHasher->hashPassword($user, 'anonymized');
+        $user->anonymize($hashedPassword);
+        $em->flush();
+
+        // ✅ Redirige l'utilisateur vers la page d'accueil ou de déconnexion
+        return $this->redirectToRoute('app_logout'); // ou 'app_logout' selon ton système
+    }
+
 
 }
 

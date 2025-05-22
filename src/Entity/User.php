@@ -228,4 +228,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return array_unique($roles);
     }
+    public function anonymize(string $hashedPassword): self
+    {
+        $randomSuffix = bin2hex(random_bytes(8));
+
+        $this->setUsername('deleted_user_' . $randomSuffix);
+        $this->setEmail('deleted_' . $randomSuffix . '@example.com');
+        $this->setPassword($hashedPassword);
+        $this->setAvatarUrl(null);
+        $this->setActive(false);
+        $this->setIsBanned(true);
+        $this->setLastConnection(null);
+        $this->setPlainPassword(null);
+
+        return $this;
+    }
 }
