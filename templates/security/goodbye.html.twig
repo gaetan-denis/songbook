@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Compte supprimé{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label == 'error' ? 'danger' : label }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="text-center mt-5">
+        <h1>👋 Au revoir !</h1>
+        <p>Votre compte a été supprimé avec succès.</p>
+        <a href="{{ path('app_logout') }}" class="btn btn-outline-secondary">Se déconnecter</a>
+    </div>
+{% endblock %}

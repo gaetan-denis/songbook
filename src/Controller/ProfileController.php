@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
@@ -118,17 +119,33 @@ final class ProfileController extends AbstractController
     public function deleteUser(
         EntityManagerInterface $em,
         UserPasswordHasherInterface $passwordHasher,
-        Security $security
+        Request $request,
+        Security $security,
+        TokenStorageInterface $tokenStorage,
+        SessionInterface $session
     ): Response {
+        /** @var User $user */
         $user = $security->getUser();
+
+        // Anonymiser les données de l'utilisateur
         $hashedPassword = $passwordHasher->hashPassword($user, 'anonymized');
         $user->anonymize($hashedPassword);
         $em->flush();
 
-        // ✅ Redirige l'utilisateur vers la page d'accueil ou de déconnexion
-        return $this->redirectToRoute('app_logout'); // ou 'app_logout' selon ton système
-    }
+        // Invalider le token de sécurité (forcer la déconnexion)
+        $tokenStorage->setToken(null);
 
+        // Invalider la session complètement
+        $session->invalidate();
+
+        // Rediriger vers une route publique
+        return $this->redirectToRoute('app_goodbye');
+    }
+    #[Route('/goodbye', name: 'app_goodbye')]
+    public function goodbye(): Response
+    {
+        return $this->render('security/goodbye.html.twig');
+    }
 
 }
 
