@@ -32,6 +32,14 @@
                     {% endif %}
                 </li>
                 <li class="list-group-item">
+                    <strong>Dernière connexion :</strong>
+                    {% if user.lastConnection %}
+                        {{ user.lastConnection|date('d/m/Y à H:i', 'Europe/Brusselsgfit ') }}
+                    {% else %}
+                        Jamais connecté
+                    {% endif %}
+                </li>
+                <li class="list-group-item">
                     <strong>Statut :</strong>
                     {% if user.isBanned %}
                         <span class="text-danger fw-bold">Banni</span>
