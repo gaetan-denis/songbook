@@ -3,17 +3,20 @@
 {% block title %}Compte supprimé{% endblock %}
 
 {% block body %}
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label == 'error' ? 'danger' : label }}">
-                {{ message }}
-            </div>
+    <div class="container mt-5">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
 
-    <div class="text-center mt-5">
-        <h1>👋 Au revoir !</h1>
-        <p>Votre compte a été supprimé avec succès.</p>
-        <a href="{{ path('app_logout') }}" class="btn btn-outline-secondary">Se déconnecter</a>
+        <div class="d-flex justify-content-center text-dark">
+            <div class="bg-light p-5 rounded shadow text-center" style="max-width: 500px; width: 100%;">
+                <h1 class="mb-3">👋 Au revoir !</h1>
+                <p class="mb-4">Votre compte a été supprimé avec succès.</p>
+            </div>
+        </div>
     </div>
 {% endblock %}

@@ -11988,4 +11988,8 @@ nav .nav-link img.rounded-circle {
   display: inline-block;
 }
 
+.toggle-password:hover {
+  color: #0d6efd; /* ou toute autre couleur Bootstrap */
+}
+
 /*# sourceMappingURL=app.css.map */
