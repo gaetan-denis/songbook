@@ -11902,6 +11902,18 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.bg-dark-blue {
+  background-color: #2b3a44;
+}
+
+.bg-grey-light {
+  background-color: #6f6f6f;
+}
+
+.text-sand {
+  color: #d0b482;
+}
+
 body {
   background-color: grey;
   background-image: url("../images/pexels-pixabay-290660.jpg");
@@ -11920,11 +11932,11 @@ html, body {
 .page-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* 100% de la hauteur de la fenêtre */
+  min-height: 100vh;
 }
 
 .content-wrap {
-  flex: 1; /* Pousse le footer vers le bas */
+  flex: 1;
 }
 
 footer {
@@ -11934,51 +11946,44 @@ footer {
   padding: 1em;
 }
 
-/* Style de base pour la navbar */
 nav {
-  background-color: #333; /* Couleur de fond sombre */
-  color: white; /* Texte blanc */
-  padding: 10px 20px; /* Espacement autour du contenu */
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
 }
 
-/* Liste horizontale pour les éléments de navigation */
 nav ul {
-  list-style: none; /* Supprimer les puces de la liste */
-  padding: 0; /* Supprimer les marges internes */
-  margin: 0; /* Supprimer les marges externes */
-  display: flex; /* Utiliser Flexbox pour la mise en page horizontale */
-  justify-content: center; /* Centrer les éléments */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
 }
 
-/* Style des éléments de la liste */
 nav ul li {
-  margin: 0 15px; /* Ajouter de l'espace entre les éléments */
+  margin: 0 15px;
 }
 
-/* Style des liens dans la navbar */
 nav ul li a {
-  text-decoration: none; /* Supprimer le soulignement des liens */
-  color: white; /* Couleur du texte */
-  font-size: 16px; /* Taille du texte */
-  font-weight: bold; /* Mettre le texte en gras */
-  padding: 8px 15px; /* Espacement autour du texte */
-  border-radius: 5px; /* Coins arrondis */
-  transition: background-color 0.3s ease; /* Transition pour le survol */
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 
-/* Changer la couleur de fond au survol */
 nav ul li a:hover {
-  background-color: #555; /* Fond gris clair au survol */
-  color: #fff; /* Maintenir le texte en blanc */
+  background-color: #555;
+  color: #fff;
 }
 
-/* Style pour un lien actif */
 nav ul li a.active {
-  background-color: #007bff; /* Fond bleu pour le lien actif */
-  color: white; /* Texte blanc */
+  background-color: #007bff;
+  color: white;
 }
 
-/* Style pour l'avatar dans la navbar */
 nav .nav-link img.rounded-circle {
   width: 32px;
   height: 32px;
@@ -11989,7 +11994,7 @@ nav .nav-link img.rounded-circle {
 }
 
 .toggle-password:hover {
-  color: #0d6efd; /* ou toute autre couleur Bootstrap */
+  color: #0d6efd;
 }
 
 /*# sourceMappingURL=app.css.map */
