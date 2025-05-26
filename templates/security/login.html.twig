@@ -30,7 +30,12 @@
 
                             <div class="mb-3">
                                 <label for="password" class="form-label">Mot de passe</label>
-                                <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+                                <div class="input-group">
+                                    <input type="password" name="_password" id="password" class="form-control password-field" autocomplete="current-password" required>
+                                    <span class="input-group-text bg-white">
+                                        <i class="fa fa-eye toggle-password" style="cursor: pointer;"></i>
+                                    </span>
+                                </div>
                             </div>
 
                             <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
@@ -49,4 +54,24 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(function (icon) {
+            icon.addEventListener('click', function () {
+                const input = this.closest('.input-group').querySelector('.password-field');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                }
+            });
+        });
+    </script>
 {% endblock %}

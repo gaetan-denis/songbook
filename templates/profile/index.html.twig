@@ -3,21 +3,98 @@
 {% block title %}Songbook | Mon Profil{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="container mt-4">
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="container mt-5 bg">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <div class="card shadow-sm border-0">
+                <div class="card shadow-sm border-0 bg">
                     <div class="card-header text-center bg-light">
                         <h2 class="mb-0">Mon Profil</h2>
                     </div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Nom d'utilisateur : {{ user.username }}</li>
-                            <li class="list-group-item">Adresse email : {{ user.email }}</li>
-                            <li class="list-group-item">Date de création du compte : {{ user.createdAt|date('d/m/Y') }}</li>
-                            <li class="list-group-item">Statut : {{ role }}</li>
+
+                    <div class="card-body text-center">
+                        {# AVATAR UTILISATEUR #}
+                        {% if user.avatarUrl %}
+                            <img src="{{ user.avatarUrl }}" alt="Avatar" class="rounded-circle mb-3" width="96" height="96" style="object-fit: cover;">
+                        {% else %}
+                            <i class="fas fa-user-circle fa-6x text-secondary mb-3"></i>
+                        {% endif %}
+
+                        <h5 class="card-title mb-2">Informations personnelles</h5>
+                        <ul class="list-group list-group-flush mb-3 text-start">
+                            <li class="list-group-item">
+                                <strong>Nom d'utilisateur :</strong> {{ user.username }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Adresse email :</strong> {{ user.email }}
+                            </li>
+                        </ul>
+
+                        <h5 class="card-title mb-2">Informations d'inscription</h5>
+                        <ul class="list-group list-group-flush mb-3 text-start">
+                            <li class="list-group-item">
+                                <strong>Créé le :</strong> {{ user.createdAt|date('d/m/Y') }}
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Conditions acceptées le :</strong>
+                                {% if user.termsAcceptedAt %}
+                                    {{ user.termsAcceptedAt|date('d/m/Y à H:i') }}
+                                {% else %}
+                                    <span class="text-muted">Non spécifié</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+
+                        <h5 class="card-title mb-2">Statut</h5>
+                        <ul class="list-group list-group-flush text-start">
+                            <li class="list-group-item">
+                                <strong>Rôle :</strong>
+                                <span class="badge bg-primary">{{ role }}</span>
+                            </li>
                         </ul>
                     </div>
+
+                    <div class="card-footer text-center bg-light">
+                        <a href="{{ path('app_profile_edit') }}" class="btn btn-outline-primary">
+                            ✏️ Modifier mon profil
+                        </a>
+                        <a href="{{ path('app_profile_export') }}" class="btn btn-outline-primary">
+                            📄 Exporter mes données
+                        </a>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                            Supprimer mon compte
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    Êtes-vous sûr de vouloir supprimer votre compte ?
+                </div>
+                <div class="modal-footer">
+                    <form method="post" action="{{ path('app_profile_delete') }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
                 </div>
             </div>
         </div>

@@ -23,8 +23,39 @@
                         {{ form_start(registrationForm) }}
                         {{ form_row(registrationForm.username) }}
                         {{ form_row(registrationForm.email) }}
-                        {{ form_row(registrationForm.plainPassword.first) }}
-                        {{ form_row(registrationForm.plainPassword.second) }}
+
+                        <div class="mb-3 position-relative">
+                            {{ form_label(registrationForm.plainPassword.first) }}
+                            <div class="input-group">
+                                {{ form_widget(registrationForm.plainPassword.first, {
+                                    'attr': {
+                                        'class': 'form-control password-field',
+                                        'autocomplete': 'new-password'
+                                    }
+                                }) }}
+                                <span class="input-group-text bg-white">
+            <i class="fa fa-eye toggle-password" style="cursor: pointer;"></i>
+        </span>
+                            </div>
+                            {{ form_errors(registrationForm.plainPassword.first) }}
+                        </div>
+
+
+                        <div class="mb-3 position-relative">
+                            {{ form_label(registrationForm.plainPassword.second) }}
+                            <div class="input-group">
+                                {{ form_widget(registrationForm.plainPassword.second, {
+                                    'attr': {
+                                        'class': 'form-control password-field',
+                                        'autocomplete': 'new-password'
+                                    }
+                                }) }}
+                                <span class="input-group-text bg-white">
+            <i class="fa fa-eye toggle-password" style="cursor: pointer;"></i>
+        </span>
+                            </div>
+                            {{ form_errors(registrationForm.plainPassword.second) }}
+                        </div>
 
                         <div class="d-grid mt-3">
                             {{ form_row(registrationForm.submit, {'attr': {'class': 'btn btn-dark w-100'}}) }}
@@ -35,4 +66,24 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(function (icon) {
+            icon.addEventListener('click', function () {
+                const input = this.closest('.input-group').querySelector('.password-field');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.classList.remove('fa-eye');
+                    this.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    this.classList.remove('fa-eye-slash');
+                    this.classList.add('fa-eye');
+                }
+            });
+        });
+    </script>
 {% endblock %}

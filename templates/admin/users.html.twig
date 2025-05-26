@@ -48,13 +48,24 @@
                         {% endif %}
                     </td>
                     <td class="d-flex gap-1">
-                        <a href="{{ path('user_edit', {'id': user.id}) }}"
-                           class="btn btn-sm btn-dark"
-                           title="Modifier">
-                            <i class="fa-solid fa-pen"></i>
+                        <a href="{{ path('user_profile', {'id': user.id}) }}" class="btn btn-sm btn-light" title="Profil">
+                            <i class="fa-solid fa-user"></i>
                         </a>
 
                         {% if user != currentUser %}
+                            {# Sélecteur de rôle actif #}
+                            <form method="POST" action="{{ path('user_edit_role', {id: user.id}) }}" class="d-inline">
+                                <select name="role"
+                                        class="form-select form-select-sm d-inline w-auto align-middle"
+                                        onchange="this.form.submit()">
+                                    <option value="ROLE_USER" {{ user.role.name == 'ROLE_USER' ? 'selected' : '' }}>Utilisateur</option>
+                                    <option value="ROLE_MODERATOR" {{ user.role.name == 'ROLE_MODERATOR' ? 'selected' : '' }}>Modérateur</option>
+                                    <option value="ROLE_ADMIN" {{ user.role.name == 'ROLE_ADMIN' ? 'selected' : '' }}>Admin</option>
+                                </select>
+                                <input type="hidden" name="_token" value="{{ csrf_token('edit-role-' ~ user.id) }}">
+                            </form>
+
+                            {# Supprimer #}
                             <form method="post"
                                   action="{{ path('user_delete', {'id': user.id}) }}"
                                   onsubmit="return confirm('⚠️ Supprimer {{ user.username }} ? Action irréversible.');">
@@ -64,22 +75,32 @@
                                 </button>
                             </form>
 
+                            {# Bannir / Réactiver #}
                             <form method="post"
                                   action="{{ path('user_ban', {'id': user.id}) }}"
                                   onsubmit="return confirm('{{ user.isBanned ? 'Réactiver' : 'Bannir' }} {{ user.username }} ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('ban-user-' ~ user.id) }}">
                                 <button class="btn btn-sm btn-dark" title="{{ user.isBanned ? 'Réactiver' : 'Bannir' }}">
                                     <i class="fa-solid fa-ban"></i> {{ user.isBanned ? 'Réactiver' : 'Bannir' }}
                                 </button>
                             </form>
+
                         {% else %}
-                            <button class="btn btn-sm btn-secondary" disabled title="Action désactivée">
+                            {# Affichage désactivé pour utilisateur courant #}
+                            <select class="form-select form-select-sm d-inline w-auto align-middle bg-secondary text-white border-0" disabled title="Impossible de modifier son propre rôle">
+                                <option selected>{{ roleLabels[user.role.name] ?? user.role.name }}</option>
+                            </select>
+
+                            <button class="btn btn-sm btn-secondary" disabled title="Action désactivée" >
                                 <i class="fa-solid fa-trash"></i>
                             </button>
+
                             <button class="btn btn-sm btn-secondary" disabled title="Action désactivée">
                                 <i class="fa-solid fa-ban"></i> Bannir
                             </button>
                         {% endif %}
                     </td>
+
                 </tr>
             {% else %}
                 <tr>

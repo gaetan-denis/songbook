@@ -56,6 +56,18 @@ class RegistrationFormType extends AbstractType
                 'invalid_message' => 'Les mots de passe doivent être identiques.',
                 'attr' => ['autocomplete' => 'new-password'],
             ])
+            ->add('agreeTerms', \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class, [
+                'label' => 'J\'accepte la <a href="/privacy-policy" target="_blank">politique de confidentialité</a> et les <a href="/term_of_use" target="_blank">conditions d\'utilisation</a>',
+                'mapped' => false,
+                'required' => true,
+                'constraints' => [
+                    new \Symfony\Component\Validator\Constraints\IsTrue([
+                        'message' => 'Vous devez accepter la politique de confidentialité et les conditions d\'utilisation pour vous inscrire.',
+                    ]),
+                ],
+                'label_html' => true,
+            ])
+
             ->add('submit', SubmitType::class, [
                 'label' => 'S\'inscrire',
             ]);

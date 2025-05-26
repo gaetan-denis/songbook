@@ -32,6 +32,7 @@ security:
                 always_remember_me: false
             logout:
                 path: app_logout
+                invalidate_session: true
                 # where to redirect after logout
                 # target: app_any_route
 

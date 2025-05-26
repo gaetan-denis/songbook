@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mentions légales{% endblock %}
+
+{% block body %}
+    <div class="container my-5 py-5 bg-dark-blue text-white rounded shadow">
+        <h1 class="text-center mb-4">Mentions légales</h1>
+
+        <h2>Éditeur du site</h2>
+        <p><strong>Nom ou raison sociale :</strong> {{ owner_name }}</p>
+        <p><strong>Adresse :</strong> {{ owner_address }}</p>
+        <p><strong>Email :</strong> <a href="mailto:{{ contact_email }}" class="text-info">{{ contact_email }}</a></p>
+
+        <h2>Hébergement</h2>
+        <p>Le site est hébergé par un prestataire tiers.</p>
+
+        <h2>Responsabilité</h2>
+        <p>L’éditeur ne peut être tenu responsable des dommages directs ou indirects causés au matériel de l’utilisateur.</p>
+
+        <h2>Propriété intellectuelle</h2>
+        <p>Tous les contenus (textes, images, etc.) sont protégés par le droit de la propriété intellectuelle.</p>
+
+        <h2>Liens hypertextes</h2>
+        <p>Des liens peuvent renvoyer vers d’autres sites, l’éditeur décline toute responsabilité quant à leur contenu.</p>
+
+        <h2>Contact</h2>
+        <p>Pour toute question, contactez-nous : <a href="mailto:{{ contact_email }}" class="text-info">{{ contact_email }}</a></p>
+    </div>
+{% endblock %}
