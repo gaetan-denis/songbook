@@ -12,9 +12,14 @@
             {{ form_start(form) }}
             {{ form_widget(form) }}
 
-            <div class="d-flex gap-2 justify-content-center">
-                <a href="{{ path('app_songbook_index') }}" class="btn btn-secondary">⬅ Retour à la liste</a>
-                <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-dark-blue w-50">
+                    <i class="fas fa-save"></i> {{ button_label|default('Enregistrer')|raw }}
+                </button>
+
+                <a href="{{ path('app_songbook_index') }}" class="btn btn-secondary w-50">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
             </div>
             {{ form_end(form) }}
         </div>

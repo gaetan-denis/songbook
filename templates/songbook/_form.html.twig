@@ -12,9 +12,14 @@
     {{ form_errors(form.description) }}
 </div>
 
-<button class="btn btn-primary">
-    {{ button_label|default('💾 Enregistrer') }}
-</button>
+<div class="d-flex gap-2">
+    <button class="btn btn-dark-blue flex-fill" type="submit">
+        <i class="fas fa-save"></i> {{ button_label|default('Enregistrer')|raw }}
+    </button>
+
+    <a href="{{ path('app_songbook_index') }}" class="btn btn-secondary flex-fill">
+        <i class="fas fa-arrow-left"></i> Retour à la liste
+    </a>
+</div>
 
 {{ form_end(form) }}
-

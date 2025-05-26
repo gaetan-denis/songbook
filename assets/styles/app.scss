@@ -12,6 +12,51 @@ $color5:#555555;
 
 
 // 3. Utilitaires
+
+.btn-dark-blue {
+    color: #fff; /* texte blanc */
+    background-color: #2b3a44; /* fond dark blue */
+    border: 1px solid #2b3a44;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-dark-blue:hover,
+.btn-dark-blue:focus,
+.btn-dark-blue:active {
+    background-color: #091522; /* version un peu plus foncée au hover */
+    border-color: #091522;
+    color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(13, 27, 42, 0.5); /* halo au focus */
+}
+
+.btn-dark-blue:disabled,
+.btn-dark-blue.disabled {
+    background-color: #6c757d; /* gris disabled */
+    border-color: #6c757d;
+    color: #e9ecef;
+    pointer-events: none;
+    opacity: 0.65;
+}
+.btn-outline-dark-blue {
+    color: $color3; /* texte en bleu foncé */
+    border-color: $color3; /* bordure bleu foncé */
+    background-color: transparent; /* fond transparent */
+    transition: all 0.3s ease;
+}
+
+.btn-outline-dark-blue:hover,
+.btn-outline-dark-blue:focus {
+    color: #fff; /* texte blanc au survol */
+    background-color: $color3; /* fond bleu foncé au survol */
+    border-color: $color3;
+}
+
+.btn-outline-pink {
+    color: #ecb5b8; /* texte en bleu foncé */
+    border-color: #ecb5b8; /* bordure bleu foncé */
+    background-color: transparent; /* fond transparent */
+    transition: all 0.3s ease;
+}
 .bg-dark-blue {
     background-color: #2b3a44;
 }
