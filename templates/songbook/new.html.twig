@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Songbook{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="mb-4 text-center">
+            <h1 class="h3">Créer un nouveau songbook</h1>
+        </div>
+
+        <div class="mx-auto col-md-6 col-lg-5">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{{ path('app_songbook_index') }}" class="btn btn-secondary">⬅ Retour à la liste</a>
+                <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
