@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Chordsheet{% endblock %}
+
+{% block body %}
+    <h1>Edit Chordsheet</h1>
+
+    {{ include('chordsheet/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_chordsheet_index') }}">back to list</a>
+
+    {{ include('chordsheet/_delete_form.html.twig') }}
+{% endblock %}

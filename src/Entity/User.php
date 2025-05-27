@@ -56,6 +56,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->createdAt = new \DateTimeImmutable();
         $this->active = true;
         $this->songbooks = new ArrayCollection();
+        $this->chordsheets = new ArrayCollection();
     }
 
     #[ORM\Column(type: 'boolean')]
@@ -69,6 +70,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: Songbook::class, mappedBy: 'user')]
     private Collection $songbooks;
+
+    /**
+     * @var Collection<int, Chordsheet>
+     */
+    #[ORM\OneToMany(targetEntity: Chordsheet::class, mappedBy: 'user')]
+    private Collection $chordsheets;
 
     // Getters
 
@@ -277,6 +284,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($songbook->getUser() === $this) {
                 $songbook->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Chordsheet>
+     */
+    public function getChordsheets(): Collection
+    {
+        return $this->chordsheets;
+    }
+
+    public function addChordsheet(Chordsheet $chordsheet): static
+    {
+        if (!$this->chordsheets->contains($chordsheet)) {
+            $this->chordsheets->add($chordsheet);
+            $chordsheet->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChordsheet(Chordsheet $chordsheet): static
+    {
+        if ($this->chordsheets->removeElement($chordsheet)) {
+            // set the owning side to null (unless already changed)
+            if ($chordsheet->getUser() === $this) {
+                $chordsheet->setUser(null);
             }
         }
 

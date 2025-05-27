@@ -1,0 +1,276 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Partition{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <h1 class="mb-4">Partition</h1>
+        <div class="row gx-4 align-items-stre tch">
+            <div class="col-md-6 d-flex flex-column">
+                <label for="fileInput" class="form-label">Charger un fichier ChordPro</label>
+                <input type="file" id="fileInput" accept=".txt,.chordpro" class="form-control mb-2">
+                <label for="message" class="form-label">Édition</label>
+                <textarea class="form-control flex-grow-1" id="message" rows="25" placeholder="Écrivez ici..." style="font-family: monospace;"></textarea>
+                <label for="filenameInput" class="form-label mt-2">Nom du fichier</label>
+                <input type="text" id="filenameInput" class="form-control mb-2" placeholder="partition.chordpro">
+                <button id="downloadBtn" class="btn btn-primary mt-2" type="button">Télécharger</button>
+                <button id="saveBtn" class="btn btn-success mt-2" type="button">Sauvegarder</button>
+            </div>
+            <div class="col-md-6 d-flex flex-column">
+                <label class="form-label">Rendu</label>
+                <div id="rendered" class="form-control flex-grow-1" style="height: 100%; font-family: monospace; white-space: pre-wrap; overflow-y: auto;"></div>
+            </div>
+        </div>
+    </div>
+    {% block script %}
+        <style>
+            .chord {
+                color: blue;
+                font-weight: bold;
+            }
+            .chorus {
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+                padding-left: 1rem;
+                background-color: #f9f9ff;
+            }
+            .verse {
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+                padding-left: 1rem;
+                background-color: #ffffff;
+            }
+            .bridge {
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+                padding-left: 1rem;
+                background-color: #fffbe6;
+            }
+            .intro {
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+                padding-left: 1rem;
+                background-color: #e6f7ff;
+            }
+
+            .outro {
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+                padding-left: 1rem;
+                background-color: #f2f2f2;
+            }
+
+            .interlude {
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+                padding-left: 1rem;
+                background-color: #eaffea;
+            }
+        </style>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const filenameInput = document.getElementById('filenameInput');
+                const input = document.getElementById('message');
+                const fileInput = document.getElementById('fileInput');
+
+                const downloadBtn = document.getElementById('downloadBtn');
+
+                downloadBtn.addEventListener('click', () => {
+                    const content = input.value;
+                    let filename = filenameInput.value.trim();
+
+                    if (!filename) {
+                        filename = 'partition';
+                    }
+
+                    // Ajoute l'extension si elle est manquante
+                    if (!filename.endsWith('.chordpro') && !filename.endsWith('.txt')) {
+                        filename += '.chordpro';
+                    }
+
+                    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+
+                    // Nettoyage
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                });
+
+
+
+                fileInput.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            input.value = e.target.result;
+                            input.dispatchEvent(new Event('input')); // déclenche le rendu
+                        };
+                        reader.readAsText(file);
+                    }
+                });
+                const output = document.getElementById('rendered');
+
+                function escapeHTML(str) {
+                    return str
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
+
+                function renderChordPro(text) {
+                    const lines = text.split('\n');
+                    let inChorus = false;
+                    let htmlOutput = '';
+
+                    lines.forEach(line => {
+                        const trimmed = line.trim();
+
+                        if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+                            const directive = trimmed.slice(1, -1).trim();
+
+                            if (directive.startsWith('title:')) {
+                                const title = directive.slice(6).trim();
+                                const capitalized = title.split(' ')
+                                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                    .join(' ');
+                                htmlOutput += `<h3>${escapeHTML(capitalized)}</h3>`;
+                            } else if (directive.startsWith('artist:')) {
+                                const artist = directive.slice(7).trim();
+                                htmlOutput += `<p><strong>Artiste : ${escapeHTML(artist)}</strong></p>`;
+                            } else if (directive.startsWith('subtitle:')) {
+                                const subtitle = directive.slice(9).trim();
+                                htmlOutput += `<h4><em>${escapeHTML(subtitle)}</em></h4>`;
+                            } else if (directive.startsWith('capo:')) {
+                                const capo = directive.slice(5).trim();
+                                htmlOutput += `<p><strong>Capo : ${escapeHTML(capo)}</strong></p>`;
+                            } else if (directive.startsWith('key:')) {
+                                const key = directive.slice(4).trim();
+                                htmlOutput += `<p><strong>Tonalité : ${escapeHTML(key)}</strong></p>`;
+                            } else if (directive.startsWith('comment:')) {
+                                const comment = directive.slice(8).trim();
+                                htmlOutput += `<p class="text-muted">${escapeHTML(comment)}</p>`;
+                            } else if (directive.startsWith('comment_italic:')) {
+                                const comment = directive.slice(15).trim();
+                                htmlOutput += `<p><em class="text-muted">${escapeHTML(comment)}</em></p>`;
+                            }
+                            else if (directive.startsWith('start_of_chorus')) {
+                                inChorus = true;
+                                const parts = directive.split(':');
+                                const label = parts[1] ? parts[1].trim() : 'Refrain';
+                                htmlOutput += `<div class="chorus mt-2 p-2 border-start border-4 border-primary bg-light"><strong>${escapeHTML(label)} :</strong><br>`;
+                            } else if (directive === 'end_of_chorus') {
+                                inChorus = false;
+                                htmlOutput += `</div>`;
+                            } else if (directive.startsWith('start_of_verse')) {
+                                const parts = directive.split(':');
+                                const label = parts[1] ? parts[1].trim() : 'Couplet';
+                                htmlOutput += `<div class="verse mt-2 p-2 border-start border-4 border-secondary bg-white"><strong>${escapeHTML(label)} :</strong><br>`;
+                            } else if (directive === 'end_of_verse') {
+                                htmlOutput += `</div>`;
+                            } else if (directive.startsWith('year:')) {
+                                const year = directive.slice(5).trim();
+                                htmlOutput += `<p><strong>Année : ${escapeHTML(year)}</strong></p>`;
+                            }else if (directive.startsWith('start_of_bridge')) {
+                                const parts = directive.split(':');
+                                const label = parts[1] ? parts[1].trim() : 'Pont';
+                                htmlOutput += `<div class="bridge mt-2 p-2 border-start border-4 border-warning bg-light"><strong>${escapeHTML(label)} :</strong><br>`;
+                            } else if (directive === 'end_of_bridge') {
+                                htmlOutput += `</div>`;
+                            } else if (directive.startsWith('start_of_intro')) {
+                                const parts = directive.split(':');
+                                const label = parts[1] ? parts[1].trim() : 'Intro';
+                                htmlOutput += `<div class="intro mt-2 p-2 border-start border-4 border-info bg-light"><strong>${escapeHTML(label)} :</strong><br>`;
+                            } else if (directive === 'end_of_intro') {
+                                htmlOutput += `</div>`;
+                            } else if (directive.startsWith('start_of_outro')) {
+                                const parts = directive.split(':');
+                                const label = parts[1] ? parts[1].trim() : 'Outro';
+                                htmlOutput += `<div class="outro mt-2 p-2 border-start border-4 border-dark bg-light"><strong>${escapeHTML(label)} :</strong><br>`;
+                            } else if (directive === 'end_of_outro') {
+                                htmlOutput += `</div>`;
+                            } else if (directive.startsWith('start_of_interlude')) {
+                                const parts = directive.split(':');
+                                const label = parts[1] ? parts[1].trim() : 'Interlude';
+                                htmlOutput += `<div class="interlude mt-2 p-2 border-start border-4 border-success bg-light"><strong>${escapeHTML(label)} :</strong><br>`;
+                            } else if (directive === 'end_of_interlude') {
+                                htmlOutput += `</div>`;
+                            }
+
+
+                            // autres directives ignorées
+                            return;
+                        }
+
+                        // Traitement des lignes avec accords
+                        let chordLine = '';
+                        let lyricLine = '';
+                        let i = 0;
+
+                        while (i < line.length) {
+                            if (line[i] === '[') {
+                                const end = line.indexOf(']', i);
+                                if (end !== -1) {
+                                    const chord = line.slice(i + 1, end);
+                                    const chordPos = lyricLine.length;
+                                    while (chordLine.length < chordPos) {
+                                        chordLine += ' ';
+                                    }
+                                    chordLine += chord;
+                                    i = end + 1;
+                                } else {
+                                    lyricLine += line[i];
+                                    i++;
+                                }
+                            } else {
+                                lyricLine += line[i];
+                                if (chordLine.length < lyricLine.length) {
+                                    chordLine += ' ';
+                                }
+                                i++;
+                            }
+                        }
+
+                        htmlOutput += `<pre>${escapeHTML(chordLine)}\n${escapeHTML(lyricLine)}</pre>`;
+                    });
+
+                    return htmlOutput;
+                }
+
+                input.addEventListener('input', () => {
+                    output.innerHTML = renderChordPro(input.value);
+                });
+
+                // AJOUTE ICI
+                const saveBtn = document.getElementById('saveBtn');
+
+                saveBtn.addEventListener('click', async () => {
+                    const content = input.value;
+                    const filename = filenameInput.value.trim();
+
+                    const response = await fetch('/chordsheet/partition/save', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ content, filename }),
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        alert("Partition sauvegardée avec l'ID : " + data.id);
+                    } else {
+                        alert("Erreur lors de la sauvegarde");
+                    }
+                });
+            });
+        </script>
+    {% endblock %}
+{% endblock %}
+

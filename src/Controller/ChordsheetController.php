@@ -1,0 +1,98 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Chordsheet;
+use App\Form\ChordsheetForm;
+use App\Repository\ChordsheetRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\SecurityBundle\Security;
+
+#[Route('/chordsheet')]
+final class ChordsheetController extends AbstractController
+{
+    #[Route(name: 'app_chordsheet_index', methods: ['GET'])]
+    public function index(ChordsheetRepository $chordsheetRepository): Response
+    {
+        return $this->render('chordsheet/index.html.twig', [
+            'chordsheets' => $chordsheetRepository->findAll(),
+        ]);
+    }
+
+    #[Route('/new', name: 'app_chordsheet_new', methods: ['GET'])]
+    public function new(): Response
+    {
+        return $this->render('chordsheet/new.html.twig');
+    }
+
+    // ROUTES SPÉCIFIQUES EN PREMIER
+    #[Route('/partition/save', name: 'partition_save', methods: ['POST'])]
+    public function save(Request $request, EntityManagerInterface $em, Security $security): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $content = $data['content'] ?? '';
+        $filename = $data['filename'] ?? null;
+
+        $user = $security->getUser();
+        if (!$user) {
+            return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
+        }
+
+        $partition = new Chordsheet();
+        $partition->setUser($user);
+        $partition->setContent($content);
+        $partition->setCreatedAt(new \DateTimeImmutable());
+        if ($filename) {
+            $partition->setTitle($filename);
+        }
+
+        $em->persist($partition);
+        $em->flush();
+
+        return new JsonResponse(['success' => true, 'id' => $partition->getId()]);
+    }
+
+    // ROUTES AVEC PARAMÈTRES VARIABLES EN DERNIER
+    #[Route('/{id}', name: 'app_chordsheet_show', methods: ['GET'])]
+    public function show(Chordsheet $chordsheet): Response
+    {
+        return $this->render('chordsheet/show.html.twig', [
+            'chordsheet' => $chordsheet,
+        ]);
+    }
+
+    #[Route('/{id}/edit', name: 'app_chordsheet_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Chordsheet $chordsheet, EntityManagerInterface $entityManager): Response
+    {
+        $form = $this->createForm(ChordsheetForm::class, $chordsheet);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_chordsheet_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('chordsheet/edit.html.twig', [
+            'chordsheet' => $chordsheet,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_chordsheet_delete', methods: ['POST'])]
+    public function delete(Request $request, Chordsheet $chordsheet, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$chordsheet->getId(), $request->getPayload()->getString('_token'))) {
+            $entityManager->remove($chordsheet);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_chordsheet_index', [], Response::HTTP_SEE_OTHER);
+    }
+}
