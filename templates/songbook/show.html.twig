@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Songbook{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="mx-auto col-md-6 col-lg-5 mt-4">
+            <h1 class="mb-4">Songbook</h1>
+
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <th>Id</th>
+                    <td>{{ songbook.id }}</td>
+                </tr>
+                <tr>
+                    <th>Title</th>
+                    <td>{{ songbook.title }}</td>
+                </tr>
+                <tr>
+                    <th>Description</th>
+                    <td>{{ songbook.description }}</td>
+                </tr>
+                <tr>
+                    <th>Created At</th>
+                    <td>{{ songbook.createdAt ? songbook.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_songbook_index') }}" class="btn btn-secondary flex-grow-1">← Retour à la liste</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

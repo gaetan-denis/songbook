@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Songbook{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="mx-auto col-md-6 col-lg-5 mt-4">
+            <h1 class="mb-4">Modifier le songbook</h1>
+
+            <div class="mb-3" >
+                {{ include('songbook/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

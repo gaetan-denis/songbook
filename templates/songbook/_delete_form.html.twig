@@ -1,0 +1,10 @@
+<form method="post"
+      action="{{ path('app_songbook_delete', {'id': songbook.id}) }}"
+      onsubmit="return confirm('Voulez-vous vraiment supprimer ce songbook ?');"
+      class="d-inline">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ songbook.id) }}">
+    <button class="btn btn-sm btn-outline-danger">
+        🗑 Supprimer
+    </button>
+</form>
+

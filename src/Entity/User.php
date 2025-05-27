@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -53,6 +55,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->active = true;
+        $this->songbooks = new ArrayCollection();
     }
 
     #[ORM\Column(type: 'boolean')]
@@ -60,6 +63,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $termsAcceptedAt = null;
+
+    /**
+     * @var Collection<int, Songbook>
+     */
+    #[ORM\OneToMany(targetEntity: Songbook::class, mappedBy: 'user')]
+    private Collection $songbooks;
 
     // Getters
 
@@ -240,6 +249,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setIsBanned(true);
         $this->setLastConnection(null);
         $this->setPlainPassword(null);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Songbook>
+     */
+    public function getSongbooks(): Collection
+    {
+        return $this->songbooks;
+    }
+
+    public function addSongbook(Songbook $songbook): static
+    {
+        if (!$this->songbooks->contains($songbook)) {
+            $this->songbooks->add($songbook);
+            $songbook->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSongbook(Songbook $songbook): static
+    {
+        if ($this->songbooks->removeElement($songbook)) {
+            // set the owning side to null (unless already changed)
+            if ($songbook->getUser() === $this) {
+                $songbook->setUser(null);
+            }
+        }
 
         return $this;
     }
