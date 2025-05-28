@@ -13,8 +13,14 @@
                 <textarea class="form-control flex-grow-1" id="message" rows="25" placeholder="Écrivez ici..." style="font-family: monospace;"></textarea>
                 <label for="filenameInput" class="form-label mt-2">Nom du fichier</label>
                 <input type="text" id="filenameInput" class="form-control mb-2" placeholder="partition.chordpro">
-                <button id="downloadBtn" class="btn btn-primary mt-2" type="button">Télécharger</button>
-                <button id="saveBtn" class="btn btn-success mt-2" type="button">Sauvegarder</button>
+                <div class="d-flex gap-2 mt-2">
+                    <!-- Boutons modifiés - gardez seulement ceux que vous voulez -->
+                    <button id="saveBtn" class="btn btn-primary flex-fill" type="button">Sauvegarder</button>
+                    <button id="backBtn" class="btn btn-secondary flex-fill" type="button">Retour aux partitions</button>
+                    <!-- Gardez les autres boutons si besoin -->
+                    <!-- <button id="downloadBtn" class="btn btn-primary" type="button">Télécharger</button> -->
+                    <!-- <button id="exportPdfBtn" class="btn btn-warning" type="button">Export PDF</button> -->
+                </div>
             </div>
             <div class="col-md-6 d-flex flex-column">
                 <label class="form-label">Rendu</label>
@@ -22,7 +28,11 @@
             </div>
         </div>
     </div>
+
     {% block script %}
+        <!-- Ajouter jsPDF seulement si vous gardez le bouton PDF -->
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> -->
+
         <style>
             .chord {
                 color: blue;
@@ -52,14 +62,12 @@
                 padding-left: 1rem;
                 background-color: #e6f7ff;
             }
-
             .outro {
                 margin-top: 1rem;
                 margin-bottom: 1rem;
                 padding-left: 1rem;
                 background-color: #f2f2f2;
             }
-
             .interlude {
                 margin-top: 1rem;
                 margin-bottom: 1rem;
@@ -67,56 +75,17 @@
                 background-color: #eaffea;
             }
         </style>
+
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 const filenameInput = document.getElementById('filenameInput');
                 const input = document.getElementById('message');
                 const fileInput = document.getElementById('fileInput');
-
-                const downloadBtn = document.getElementById('downloadBtn');
-
-                downloadBtn.addEventListener('click', () => {
-                    const content = input.value;
-                    let filename = filenameInput.value.trim();
-
-                    if (!filename) {
-                        filename = 'partition';
-                    }
-
-                    // Ajoute l'extension si elle est manquante
-                    if (!filename.endsWith('.chordpro') && !filename.endsWith('.txt')) {
-                        filename += '.chordpro';
-                    }
-
-                    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = filename;
-                    document.body.appendChild(link);
-                    link.click();
-
-                    // Nettoyage
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                });
-
-
-
-                fileInput.addEventListener('change', (event) => {
-                    const file = event.target.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            input.value = e.target.result;
-                            input.dispatchEvent(new Event('input')); // déclenche le rendu
-                        };
-                        reader.readAsText(file);
-                    }
-                });
+                const saveBtn = document.getElementById('saveBtn');
+                const backBtn = document.getElementById('backBtn'); // NOUVEAU
                 const output = document.getElementById('rendered');
 
+                // Fonctions essentielles pour le parser - NE PAS TOUCHER
                 function escapeHTML(str) {
                     return str
                         .replace(/&/g, '&amp;')
@@ -203,8 +172,6 @@
                                 htmlOutput += `</div>`;
                             }
 
-
-                            // autres directives ignorées
                             return;
                         }
 
@@ -243,34 +210,63 @@
                     return htmlOutput;
                 }
 
+                // EVENT LISTENERS ESSENTIELS - NE PAS SUPPRIMER
+
+                // Chargement de fichier
+                fileInput.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            input.value = e.target.result;
+                            input.dispatchEvent(new Event('input')); // déclenche le rendu
+                        };
+                        reader.readAsText(file);
+                    }
+                });
+
+                // CRITIQUE : Parser en temps réel - NE PAS SUPPRIMER
                 input.addEventListener('input', () => {
                     output.innerHTML = renderChordPro(input.value);
                 });
 
-                // AJOUTE ICI
-                const saveBtn = document.getElementById('saveBtn');
-
+                // Sauvegarde
                 saveBtn.addEventListener('click', async () => {
                     const content = input.value;
                     const filename = filenameInput.value.trim();
 
-                    const response = await fetch('/chordsheet/partition/save', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ content, filename }),
-                    });
+                    try {
+                        const response = await fetch('/chordsheet/partition/save', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ content, filename }),
+                        });
 
-                    if (response.ok) {
-                        const data = await response.json();
-                        alert("La partition \"" + data.filename + "\" a été sauvegardée avec succès !");
-                    } else {
+                        if (response.ok) {
+                            const data = await response.json();
+                            alert("La partition \"" + data.filename + "\" a été sauvegardée avec succès !");
+                        } else {
+                            alert("Erreur lors de la sauvegarde");
+                        }
+                    } catch (error) {
+                        console.error('Erreur:', error);
                         alert("Erreur lors de la sauvegarde");
                     }
                 });
+
+                // NOUVEAU : Retour aux partitions
+                backBtn.addEventListener('click', () => {
+                    // Remplacez par votre URL de retour
+                    window.location.href = '/chordsheet/'; // ou votre route
+                });
+
+                // Rendu initial si il y a déjà du contenu
+                if (input.value.trim()) {
+                    output.innerHTML = renderChordPro(input.value);
+                }
             });
         </script>
     {% endblock %}
 {% endblock %}
-
