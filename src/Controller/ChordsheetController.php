@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 #[Route('/chordsheet')]
 final class ChordsheetController extends AbstractController
@@ -110,5 +111,23 @@ final class ChordsheetController extends AbstractController
         }
 
         return $this->redirectToRoute('app_chordsheet_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    // src/Controller/ChordsheetController.php
+    #[Route('/chordsheet/{id}/export', name: 'app_chordsheet_export', methods: ['GET'])]
+    public function export(Chordsheet $chordsheet): Response
+    {
+        $slugger = new AsciiSlugger();
+        $safeTitle = $slugger->slug($chordsheet->getTitle())->lower();
+        $filename = $safeTitle . '.chordpro';
+
+        return new Response(
+            $chordsheet->getContent(), // contenu en format ChordPro
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'text/plain',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]
+        );
     }
 }

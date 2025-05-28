@@ -16,13 +16,6 @@ class ChordsheetForm extends AbstractType
         $builder
             ->add('title')
             ->add('content')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
-            ->add('user', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'id',
-            ])
         ;
     }
 

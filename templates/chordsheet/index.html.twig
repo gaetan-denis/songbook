@@ -43,6 +43,10 @@
                                 <a href="{{ path('app_chordsheet_edit', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-dark">
                                     <i class="fas fa-pen me-1"></i> Modifier
                                 </a>
+                                <a href="{{ path('app_chordsheet_export', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-file-download me-1"></i> Exporter CHORDPRO
+                                </a>
+                                {{ include('chordsheet/_delete_form.html.twig', { chordsheet: chordsheet }) }}
                             </td>
                         </tr>
                     {% endfor %}
