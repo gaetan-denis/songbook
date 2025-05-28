@@ -17,10 +17,15 @@ use Symfony\Bundle\SecurityBundle\Security;
 final class ChordsheetController extends AbstractController
 {
     #[Route(name: 'app_chordsheet_index', methods: ['GET'])]
-    public function index(ChordsheetRepository $chordsheetRepository): Response
+    public function index(ChordsheetRepository $chordsheetRepository, Security $security): Response
     {
+        $user = $security->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour voir vos partitions.');
+        }
+
         return $this->render('chordsheet/index.html.twig', [
-            'chordsheets' => $chordsheetRepository->findAll(),
+            'chordsheets' => $chordsheetRepository->findBy(['user' => $user]),
         ]);
     }
 
@@ -55,21 +60,28 @@ final class ChordsheetController extends AbstractController
         $em->persist($partition);
         $em->flush();
 
-        return new JsonResponse(['success' => true, 'id' => $partition->getId()]);
+        return new JsonResponse(['success' => true, 'id' => $partition->getId(),'filename' => $filename,]);
     }
 
     // ROUTES AVEC PARAMÈTRES VARIABLES EN DERNIER
     #[Route('/{id}', name: 'app_chordsheet_show', methods: ['GET'])]
-    public function show(Chordsheet $chordsheet): Response
+    public function show(Chordsheet $chordsheet, Security $security): Response
     {
+        if ($chordsheet->getUser() !== $security->getUser()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas accéder à cette partition.');
+        }
+
         return $this->render('chordsheet/show.html.twig', [
             'chordsheet' => $chordsheet,
         ]);
     }
-
     #[Route('/{id}/edit', name: 'app_chordsheet_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Chordsheet $chordsheet, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Chordsheet $chordsheet, EntityManagerInterface $entityManager, Security $security): Response
     {
+        if ($chordsheet->getUser() !== $security->getUser()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas modifier cette partition.');
+        }
+
         $form = $this->createForm(ChordsheetForm::class, $chordsheet);
         $form->handleRequest($request);
 
@@ -86,8 +98,12 @@ final class ChordsheetController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_chordsheet_delete', methods: ['POST'])]
-    public function delete(Request $request, Chordsheet $chordsheet, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Chordsheet $chordsheet, EntityManagerInterface $entityManager, Security $security): Response
     {
+        if ($chordsheet->getUser() !== $security->getUser()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer cette partition.');
+        }
+
         if ($this->isCsrfTokenValid('delete'.$chordsheet->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($chordsheet);
             $entityManager->flush();
