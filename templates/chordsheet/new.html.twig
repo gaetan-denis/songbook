@@ -247,6 +247,7 @@
                         if (response.ok) {
                             const data = await response.json();
                             alert("La partition \"" + data.filename + "\" a été sauvegardée avec succès !");
+                            window.location.href = '/chordsheet';
                         } else {
                             alert("Erreur lors de la sauvegarde");
                         }

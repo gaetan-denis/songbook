@@ -130,4 +130,34 @@ final class ChordsheetController extends AbstractController
             ]
         );
     }
+
+    // Ajoutez cette route dans votre ChordsheetController.php
+
+    #[Route('/{id}/update', name: 'chordsheet_update', methods: ['POST'])]
+    public function update(Request $request, Chordsheet $chordsheet, EntityManagerInterface $em, Security $security): JsonResponse
+    {
+        // Vérification de sécurité
+        if ($chordsheet->getUser() !== $security->getUser()) {
+            return new JsonResponse(['error' => 'Accès non autorisé'], 403);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        $content = $data['content'] ?? '';
+        $filename = $data['filename'] ?? null;
+
+        // Mise à jour de la partition
+        $chordsheet->setContent($content);
+        if ($filename) {
+            $chordsheet->setTitle($filename);
+        }
+
+        $em->flush();
+
+        return new JsonResponse([
+            'success' => true,
+            'id' => $chordsheet->getId(),
+            'filename' => $filename ?? $chordsheet->getTitle()
+        ]);
+    }
 }
