@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ChordsheetRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ChordsheetRepository::class)]
 class Chordsheet
@@ -18,14 +19,18 @@ class Chordsheet
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $title = null;
+    #[ORM\Column(length: 255, nullable: false)]
+    #[Assert\NotBlank(message: 'Le titre ne peut pas être vide.')]
+    private string $title;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $content = null;
+    #[ORM\Column(type: Types::TEXT, nullable: false)]
+    #[Assert\NotBlank(message: 'Le contenu ne peut pas être vide.')]
+    private string $content;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+    #[ORM\Column(type: 'boolean')]
+    private bool $isPublic = false;
 
     public function getId(): ?int
     {
@@ -44,19 +49,19 @@ class Chordsheet
         return $this;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function setTitle(?string $title): static
+    public function setTitle(string $title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function getContent(): ?string
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -76,6 +81,18 @@ class Chordsheet
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->isPublic;
+    }
+
+    public function setIsPublic(bool $isPublic): static
+    {
+        $this->isPublic = $isPublic;
 
         return $this;
     }

@@ -234,9 +234,27 @@
                 });
 
                 // Mise à jour de la partition
+                // Mise à jour de la partition avec validation côté client et gestion d'erreurs améliorée
                 updateBtn.addEventListener('click', async () => {
-                    const content = input.value;
+                    const content = input.value.trim();
                     const filename = filenameInput.value.trim();
+
+                    // Validation côté client
+                    if (!filename) {
+                        alert("Le titre ne peut pas être vide.");
+                        filenameInput.focus();
+                        return;
+                    }
+
+                    if (!content) {
+                        alert("Le contenu ne peut pas être vide.");
+                        input.focus();
+                        return;
+                    }
+
+                    // Désactiver le bouton pendant la mise à jour
+                    updateBtn.disabled = true;
+                    updateBtn.textContent = "Mise à jour...";
 
                     try {
                         const response = await fetch(`/chordsheet/${chordsheetId}/update`, {
@@ -247,17 +265,24 @@
                             body: JSON.stringify({ content, filename }),
                         });
 
+                        const data = await response.json();
+
                         if (response.ok) {
-                            const data = await response.json();
                             alert("La partition \"" + data.filename + "\" a été mise à jour avec succès !");
                             // Rediriger vers la page de visualisation
                             window.location.href = '/chordsheet';
                         } else {
-                            alert("Erreur lors de la mise à jour");
+                            // Afficher le message d'erreur spécifique du serveur
+                            const errorMessage = data.error || "Erreur lors de la mise à jour";
+                            alert(errorMessage);
                         }
                     } catch (error) {
                         console.error('Erreur:', error);
-                        alert("Erreur lors de la mise à jour");
+                        alert("Erreur de communication avec le serveur");
+                    } finally {
+                        // Réactiver le bouton
+                        updateBtn.disabled = false;
+                        updateBtn.textContent = "Mettre à jour";
                     }
                 });
 

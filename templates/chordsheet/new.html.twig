@@ -230,10 +230,27 @@
                     output.innerHTML = renderChordPro(input.value);
                 });
 
-                // Sauvegarde
+                // Sauvegarde avec validation côté client et gestion d'erreurs améliorée
                 saveBtn.addEventListener('click', async () => {
-                    const content = input.value;
+                    const content = input.value.trim();
                     const filename = filenameInput.value.trim();
+
+                    // Validation côté client
+                    if (!filename) {
+                        alert("Le titre ne peut pas être vide.");
+                        filenameInput.focus();
+                        return;
+                    }
+
+                    if (!content) {
+                        alert("Le contenu ne peut pas être vide.");
+                        input.focus();
+                        return;
+                    }
+
+                    // Désactiver le bouton pendant la sauvegarde
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = "Sauvegarde...";
 
                     try {
                         const response = await fetch('/chordsheet/partition/save', {
@@ -244,16 +261,23 @@
                             body: JSON.stringify({ content, filename }),
                         });
 
+                        const data = await response.json();
+
                         if (response.ok) {
-                            const data = await response.json();
                             alert("La partition \"" + data.filename + "\" a été sauvegardée avec succès !");
                             window.location.href = '/chordsheet';
                         } else {
-                            alert("Erreur lors de la sauvegarde");
+                            // Afficher le message d'erreur spécifique du serveur
+                            const errorMessage = data.error || "Erreur lors de la sauvegarde";
+                            alert(errorMessage);
                         }
                     } catch (error) {
                         console.error('Erreur:', error);
-                        alert("Erreur lors de la sauvegarde");
+                        alert("Erreur de communication avec le serveur");
+                    } finally {
+                        // Réactiver le bouton
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = "Sauvegarder";
                     }
                 });
 

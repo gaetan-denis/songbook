@@ -42,27 +42,39 @@ final class ChordsheetController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $content = $data['content'] ?? '';
-        $filename = $data['filename'] ?? null;
+        $content = trim($data['content'] ?? '');
+        $filename = trim($data['filename'] ?? '');
 
         $user = $security->getUser();
         if (!$user) {
             return new JsonResponse(['error' => 'Utilisateur non connecté'], 401);
         }
 
+        // Vérification : contenu ou titre vide
+        if (empty($filename)) {
+            return new JsonResponse(['error' => 'Le titre ne peut pas être vide.'], 400);
+        }
+
+        if (empty($content)) {
+            return new JsonResponse(['error' => 'Le contenu ne peut pas être vide.'], 400);
+        }
+
         $partition = new Chordsheet();
         $partition->setUser($user);
         $partition->setContent($content);
         $partition->setCreatedAt(new \DateTimeImmutable());
-        if ($filename) {
-            $partition->setTitle($filename);
-        }
+        $partition->setTitle($filename);
 
         $em->persist($partition);
         $em->flush();
 
-        return new JsonResponse(['success' => true, 'id' => $partition->getId(),'filename' => $filename,]);
+        return new JsonResponse([
+            'success' => true,
+            'id' => $partition->getId(),
+            'filename' => $filename,
+        ]);
     }
+
 
     // ROUTES AVEC PARAMÈTRES VARIABLES EN DERNIER
     #[Route('/{id}', name: 'app_chordsheet_show', methods: ['GET'])]
@@ -143,21 +155,28 @@ final class ChordsheetController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        $content = $data['content'] ?? '';
-        $filename = $data['filename'] ?? null;
+        $content = trim($data['content'] ?? '');
+        $filename = trim($data['filename'] ?? '');
+
+        // Vérification : contenu ou titre vide (comme dans la méthode save)
+        if (empty($filename)) {
+            return new JsonResponse(['error' => 'Le titre ne peut pas être vide.'], 400);
+        }
+
+        if (empty($content)) {
+            return new JsonResponse(['error' => 'Le contenu ne peut pas être vide.'], 400);
+        }
 
         // Mise à jour de la partition
         $chordsheet->setContent($content);
-        if ($filename) {
-            $chordsheet->setTitle($filename);
-        }
+        $chordsheet->setTitle($filename);
 
         $em->flush();
 
         return new JsonResponse([
             'success' => true,
             'id' => $chordsheet->getId(),
-            'filename' => $filename ?? $chordsheet->getTitle()
+            'filename' => $chordsheet->getTitle()
         ]);
     }
 }
