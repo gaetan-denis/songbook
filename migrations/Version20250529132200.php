@@ -21,7 +21,7 @@ final class Version20250529132200 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE chordsheet ADD is_public TINYINT(1) NOT NULL, CHANGE title title VARCHAR(255) NOT NULL
+            ALTER TABLE chordsheet CHANGE title title VARCHAR(255) NOT NULL
         SQL);
     }
 
