@@ -91,17 +91,49 @@ $font-primary: 'Lora', serif;
 }
 body {
     background-color: #212529;
-    background-image: url("../images/pexels-pixabay-290660.jpg");
-    background-size: cover;
+    //background-image: url("../images/pexels-pixabay-290660.jpg");
+    //background-size: cover;
 
-    background-position: center;
-    background-repeat: no-repeat;
-    min-height: 100vh;
+    //background-position: center;
+    //background-repeat: no-repeat;
+    //min-height: 100vh;
 
     font-family: $font-primary;
     font-size: 16px;
     line-height: 1.6;
     color: $color8; // gris foncé pour le texte
+}
+
+.background-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("../images/pexels-pixabay-290660.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+}
+
+.skip-link {
+    position: absolute;
+    left: -999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+.skip-link:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    left: 0;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    z-index: 1000;
 }
 
 h1, h2, h3, h4 {
