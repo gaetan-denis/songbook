@@ -77,15 +77,20 @@ final class ChordsheetController extends AbstractController
 
 
     // ROUTES AVEC PARAMÈTRES VARIABLES EN DERNIER
-    #[Route('/{id}', name: 'app_chordsheet_show', methods: ['GET'])]
+    #[Route('/chordsheet/{id}', name: 'app_chordsheet_show', methods: ['GET'])]
     public function show(Chordsheet $chordsheet, Security $security): Response
     {
-        if ($chordsheet->getUser() !== $security->getUser()) {
+        $user = $security->getUser();
+
+        // Si la partition n'est pas publique, vérifier que l'utilisateur en est le propriétaire
+        if (!$chordsheet->isPublic() && ($chordsheet->getUser() !== $user)) {
             throw $this->createAccessDeniedException('Vous ne pouvez pas accéder à cette partition.');
         }
 
         return $this->render('chordsheet/show.html.twig', [
             'chordsheet' => $chordsheet,
+            'isOwner' => $user && $chordsheet->getUser() === $user,
+            'isPublicView' => $chordsheet->isPublic() && (!$user || $chordsheet->getUser() !== $user),
         ]);
     }
     #[Route('/{id}/edit', name: 'app_chordsheet_edit', methods: ['GET', 'POST'])]
@@ -201,5 +206,73 @@ final class ChordsheetController extends AbstractController
             'isPublic' => $chordsheet->isPublic(),
             'message' => $chordsheet->isPublic() ? 'Partition publiée avec succès' : 'Partition rendue privée'
         ]);
+    }
+    #[Route('/library', name: 'app_chordsheet_library', methods: ['GET'])]
+    public function library(ChordsheetRepository $chordsheetRepository, Security $security): Response
+    {
+        // Récupérer toutes les partitions publiques
+        $publicChordsheets = $chordsheetRepository->findBy(['isPublic' => true], ['createdAt' => 'DESC']);
+
+        return $this->render('chordsheet/library.html.twig', [
+            'chordsheets' => $publicChordsheets,
+            'currentUser' => $security->getUser(),
+        ]);
+    }
+
+    #[Route('/library/{id}/export', name: 'app_chordsheet_library_export', methods: ['GET'])]
+    public function libraryExport(Chordsheet $chordsheet, Security $security): Response
+    {
+        // Vérifier que la partition est publique
+        if (!$chordsheet->isPublic()) {
+            throw $this->createAccessDeniedException('Cette partition n\'est pas publique.');
+        }
+
+        // Vérifier que l'utilisateur est connecté
+        if (!$security->getUser()) {
+            throw $this->createAccessDeniedException('Vous devez être connecté pour télécharger une partition.');
+        }
+
+        $slugger = new AsciiSlugger();
+        $safeTitle = $slugger->slug($chordsheet->getTitle())->lower();
+        $filename = $safeTitle . '.chordpro';
+
+        return new Response(
+            $chordsheet->getContent(),
+            Response::HTTP_OK,
+            [
+                'Content-Type' => 'text/plain',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]
+        );
+    }
+
+    #[Route('/library/{id}/delete', name: 'app_chordsheet_library_delete', methods: ['POST'])]
+    public function libraryDelete(Request $request, Chordsheet $chordsheet, EntityManagerInterface $entityManager, Security $security): Response
+    {
+        $user = $security->getUser();
+
+        // Vérifier que l'utilisateur est connecté
+        if (!$user) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
+
+        // Vérifier que l'utilisateur est admin
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Seuls les administrateurs peuvent supprimer des partitions de la bibliothèque.');
+        }
+
+        // Vérifier que la partition est publique
+        if (!$chordsheet->isPublic()) {
+            throw $this->createAccessDeniedException('Cette partition n\'est pas publique.');
+        }
+
+        if ($this->isCsrfTokenValid('delete_library'.$chordsheet->getId(), $request->getPayload()->getString('_token'))) {
+            $entityManager->remove($chordsheet);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Partition supprimée avec succès de la bibliothèque.');
+        }
+
+        return $this->redirectToRoute('app_chordsheet_library', [], Response::HTTP_SEE_OTHER);
     }
 }
