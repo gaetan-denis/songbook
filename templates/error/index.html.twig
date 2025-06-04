@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page non trouvée{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card text-center shadow-sm border-0 bg-dark-blue text-light">
+                    <div class="card-body p-5">
+                        <h1 class="display-4 mb-3 text-danger">Oups !</h1>
+                        <p class="lead">La page que vous recherchez n'existe pas ou a été déplacée.</p>
+                        <a href="{{ path('app_home') }}" class="btn btn-green mt-3">
+                            Retour à l’accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
