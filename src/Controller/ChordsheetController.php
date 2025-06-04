@@ -179,4 +179,27 @@ final class ChordsheetController extends AbstractController
             'filename' => $chordsheet->getTitle()
         ]);
     }
+    #[Route('/{id}/toggle-public', name: 'app_chordsheet_toggle_public', methods: ['POST'])]
+    public function togglePublic(Request $request, Chordsheet $chordsheet, EntityManagerInterface $entityManager, Security $security): JsonResponse
+    {
+        // Vérification de sécurité
+        if ($chordsheet->getUser() !== $security->getUser()) {
+            return new JsonResponse(['error' => 'Accès non autorisé'], 403);
+        }
+
+        // Vérification du token CSRF pour la sécurité
+        if (!$this->isCsrfTokenValid('toggle_public'.$chordsheet->getId(), $request->getPayload()->getString('_token'))) {
+            return new JsonResponse(['error' => 'Token CSRF invalide'], 400);
+        }
+
+        // Basculer le statut public/privé
+        $chordsheet->setIsPublic(!$chordsheet->isPublic());
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'success' => true,
+            'isPublic' => $chordsheet->isPublic(),
+            'message' => $chordsheet->isPublic() ? 'Partition publiée avec succès' : 'Partition rendue privée'
+        ]);
+    }
 }

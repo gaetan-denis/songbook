@@ -27,6 +27,7 @@
                     <thead class="table-dark">
                     <tr>
                         <th>Titre</th>
+                        <th>Statut</th>
                         <th>Créé le</th>
                         <th>Actions</th>
                     </tr>
@@ -35,6 +36,17 @@
                     {% for chordsheet in chordsheets %}
                         <tr>
                             <td>{{ chordsheet.title }}</td>
+                            <td>
+                                {% if chordsheet.isPublic %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-globe me-1"></i> Publique
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-lock me-1"></i> Privée
+                                    </span>
+                                {% endif %}
+                            </td>
                             <td>{{ chordsheet.createdAt ? chordsheet.createdAt|date('d/m/Y H:i', 'Europe/Brussels') : '' }}</td>
                             <td>
                                 <a href="{{ path('app_chordsheet_show', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-dark-blue">
@@ -43,6 +55,19 @@
                                 <a href="{{ path('app_chordsheet_edit', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-dark">
                                     <i class="fas fa-pen me-1"></i> Modifier
                                 </a>
+
+                                <!-- Bouton Publier/Dépublier -->
+                                <button class="btn btn-sm toggle-public-btn {% if chordsheet.isPublic %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
+                                        data-chordsheet-id="{{ chordsheet.id }}"
+                                        data-is-public="{{ chordsheet.isPublic ? 'true' : 'false' }}"
+                                        data-csrf-token="{{ csrf_token('toggle_public' ~ chordsheet.id) }}">
+                                    {% if chordsheet.isPublic %}
+                                        <i class="fas fa-eye-slash me-1"></i> Rendre privée
+                                    {% else %}
+                                        <i class="fas fa-globe me-1"></i> Publier
+                                    {% endif %}
+                                </button>
+
                                 <a href="{{ path('app_chordsheet_export', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-success">
                                     <i class="fas fa-file-download me-1"></i> Exporter CHORDPRO
                                 </a>
@@ -280,6 +305,61 @@
                     const content = button.dataset.chordsheetContent;
                     const title = button.dataset.chordsheetTitle;
                     exportToPdf(content, title);
+                });
+            });
+
+            // Event listener pour les boutons de publication/dépublication
+            document.querySelectorAll('.toggle-public-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const chordsheetId = button.dataset.chordsheetId;
+                    const isPublic = button.dataset.isPublic === 'true';
+                    const csrfToken = button.dataset.csrfToken;
+
+                    // Confirmation avant action
+                    const action = isPublic ? 'rendre privée' : 'publier';
+                    if (!confirm(`Voulez-vous vraiment ${action} cette partition ?`)) {
+                        return;
+                    }
+
+                    // Désactiver le bouton pendant la requête
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Traitement...';
+
+                    try {
+                        const response = await fetch(`/chordsheet/${chordsheetId}/toggle-public`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `_token=${encodeURIComponent(csrfToken)}`
+                        });
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                            // Recharger la page pour mettre à jour l'affichage
+                            location.reload();
+                        } else {
+                            alert('Erreur: ' + (data.error || 'Une erreur est survenue'));
+                            button.disabled = false;
+                            // Restaurer le texte du bouton
+                            if (isPublic) {
+                                button.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Rendre privée';
+                            } else {
+                                button.innerHTML = '<i class="fas fa-globe me-1"></i> Publier';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Erreur:', error);
+                        alert('Une erreur de communication est survenue');
+                        button.disabled = false;
+                        // Restaurer le texte du bouton
+                        if (isPublic) {
+                            button.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Rendre privée';
+                        } else {
+                            button.innerHTML = '<i class="fas fa-globe me-1"></i> Publier';
+                        }
+                    }
                 });
             });
         });
