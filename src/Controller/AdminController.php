@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 // Utilise Annotation pour la route
 
@@ -148,13 +149,15 @@ final class AdminController extends AbstractController
             'user' => $user,
         ]);
     }
+
     #[Route('/admin/user/{id}/edit-role', name: 'user_edit_role', methods: ['POST'])]
     #[IsGranted('ROLE_MODERATOR')]
     public function editRole(
         Request $request,
         User $user,
         EntityManagerInterface $em,
-        RoleRepository $roleRepository
+        RoleRepository $roleRepository,
+        SessionInterface $session
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_MODERATOR');
 
@@ -171,7 +174,7 @@ final class AdminController extends AbstractController
             return $this->redirectToRoute('app_admin_users');
         }
 
-        // Rôles de l'utilisateur ciblé
+        $currentUser = $this->getUser();
         $targetRoles = $user->getRoles();
 
         // ⚠️ Empêche un modérateur de modifier un admin ou un autre modérateur
@@ -193,6 +196,66 @@ final class AdminController extends AbstractController
             return $this->redirectToRoute('app_admin_users');
         }
 
+        // 🔥 LOGIQUE DE SUCCESSION ADMINISTRATIVE
+        if ($newRoleName === 'ROLE_ADMIN' && $this->isGranted('ROLE_ADMIN')) {
+            // Vérifier si l'admin veut vraiment transférer ses privilèges
+            $confirmed = $request->request->get('admin_succession_confirmed');
+
+            if (!$confirmed) {
+                // Première tentative - demander confirmation
+                $this->addFlash('warning',
+                    sprintf(
+                        'ATTENTION : En nommant %s administrateur, vous serez automatiquement rétrogradé au rang d\'utilisateur standard. Cette action est DÉFINITIVE et IMMÉDIATE. Confirmez pour continuer.',
+                        $user->getUsername()
+                    )
+                );
+                return $this->redirectToRoute('app_admin_users', [
+                    'confirm_admin_transfer' => $user->getId()
+                ]);
+            }
+
+            // Succession confirmée - procéder au transfert
+            $role = $roleRepository->findOneBy(['name' => $newRoleName]);
+            $userRole = $roleRepository->findOneBy(['name' => 'ROLE_USER']);
+
+            if (!$role || !$userRole) {
+                $this->addFlash('danger', 'Erreur lors de la récupération des rôles.');
+                return $this->redirectToRoute('app_admin_users');
+            }
+
+            // Transaction pour s'assurer que les deux changements se font
+            $em->beginTransaction();
+            try {
+                // 1. Promouvoir le nouvel admin
+                $user->setRole($role);
+
+                // 2. Rétrograder l'ancien admin
+                $currentUser->setRole($userRole);
+
+                $em->flush();
+                $em->commit();
+
+                // 3. Invalider la session de l'ancien admin pour forcer la reconnexion
+                $session->invalidate();
+
+                $this->addFlash('success',
+                    sprintf(
+                        'Succession administrative effectuée. %s est maintenant administrateur. Vous avez été déconnecté avec succès.',
+                        $user->getUsername()
+                    )
+                );
+
+                // Rediriger vers la page de connexion
+                return $this->redirectToRoute('app_login');
+            } catch (\Exception $e) {
+                $em->rollback();
+                $this->addFlash('danger', 'Erreur lors de la succession administrative. Aucun changement effectué.');
+            }
+
+            return $this->redirectToRoute('app_admin_users');
+        }
+
+        // Logique normale pour les autres changements de rôle
         $role = $roleRepository->findOneBy(['name' => $newRoleName]);
         if (!$role) {
             $this->addFlash('danger', 'Le rôle spécifié n\'existe pas dans la base de données.');
@@ -204,5 +267,20 @@ final class AdminController extends AbstractController
 
         $this->addFlash('success', 'Rôle mis à jour avec succès.');
         return $this->redirectToRoute('app_admin_users');
+    }
+
+    /**
+     * Méthode helper pour gérer la déconnexion forcée d'un utilisateur
+     * (utile si on veut étendre cette fonctionnalité à d'autres cas)
+     */
+    private function forceUserLogout(User $user, SessionInterface $session): void
+    {
+        // Si l'utilisateur modifié est l'utilisateur courant, invalider sa session
+        if ($user === $this->getUser()) {
+            $session->invalidate();
+        }
+
+        // Note: Pour déconnecter d'autres utilisateurs, il faudrait une approche plus complexe
+        // impliquant un système de gestion de sessions centralisé
     }
 }
