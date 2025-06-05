@@ -51,7 +51,15 @@
                                 <i class="fas fa-user me-1"></i>
                                 {{ chordsheet.user.username }}
                             </td>
-                            <td>{{ chordsheet.createdAt ? chordsheet.createdAt|date('d/m/Y H:i', 'Europe/Brussels') : '' }}</td>
+                            <td>
+                                {# Afficher publishedAt si disponible, sinon createdAt comme fallback #}
+                                {% if chordsheet.publishedAt %}
+                                    {{ chordsheet.publishedAt|date('d/m/Y H:i', 'Europe/Brussels') }}
+                                {% elseif chordsheet.createdAt %}
+                                    {{ chordsheet.createdAt|date('d/m/Y H:i', 'Europe/Brussels') }}
+                                    <small class="text-muted">(créé le)</small>
+                                {% endif %}
+                            </td>
                             <td>
                                 <!-- Bouton Voir (toujours visible) -->
                                 <a href="{{ path('app_chordsheet_show', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-primary">
@@ -60,8 +68,6 @@
 
                                 {% if currentUser %}
                                     <!-- Boutons pour utilisateurs connectés -->
-
-
 
                                     <!-- Boutons de téléchargement -->
                                     <a href="{{ path('app_chordsheet_library_export', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-success">
@@ -77,7 +83,14 @@
 
                                     <!-- Bouton Supprimer (seulement pour les admins) -->
                                     {% if is_granted('ROLE_ADMIN') %}
-
+                                        <form method="post" action="{{ path('app_chordsheet_library_delete', {'id': chordsheet.id}) }}"
+                                              style="display: inline-block;"
+                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette partition de la bibliothèque ?')">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_library' ~ chordsheet.id) }}">
+                                            <button class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash me-1"></i> Supprimer
+                                            </button>
+                                        </form>
                                     {% endif %}
                                 {% else %}
                                     <!-- Message pour utilisateurs non connectés -->

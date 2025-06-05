@@ -32,6 +32,9 @@ class Chordsheet
     #[ORM\Column(type: 'boolean')]
     private bool $isPublic = false;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $publishedAt = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -93,6 +96,17 @@ class Chordsheet
     public function setIsPublic(bool $isPublic): static
     {
         $this->isPublic = $isPublic;
+
+        return $this;
+    }
+    public function getPublishedAt(): ?\DateTimeImmutable
+    {
+        return $this->publishedAt;
+    }
+
+    public function setPublishedAt(?\DateTimeImmutable $publishedAt): static
+    {
+        $this->publishedAt = $publishedAt;
 
         return $this;
     }

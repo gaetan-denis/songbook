@@ -184,6 +184,7 @@ final class ChordsheetController extends AbstractController
             'filename' => $chordsheet->getTitle()
         ]);
     }
+
     #[Route('/{id}/toggle-public', name: 'app_chordsheet_toggle_public', methods: ['POST'])]
     public function togglePublic(Request $request, Chordsheet $chordsheet, EntityManagerInterface $entityManager, Security $security): JsonResponse
     {
@@ -197,8 +198,18 @@ final class ChordsheetController extends AbstractController
             return new JsonResponse(['error' => 'Token CSRF invalide'], 400);
         }
 
+        $wasPublic = $chordsheet->isPublic();
+
         // Basculer le statut public/privé
-        $chordsheet->setIsPublic(!$chordsheet->isPublic());
+        $chordsheet->setIsPublic(!$wasPublic);
+
+        // Si on publie la partition (passage de privé à public)
+        if (!$wasPublic && $chordsheet->isPublic()) {
+            $chordsheet->setPublishedAt(new \DateTimeImmutable());
+        }
+        // Si on rend privée une partition qui était publique, on peut garder la date de publication
+        // ou la supprimer selon vos besoins. Ici je la garde pour l'historique
+
         $entityManager->flush();
 
         return new JsonResponse([
@@ -207,11 +218,15 @@ final class ChordsheetController extends AbstractController
             'message' => $chordsheet->isPublic() ? 'Partition publiée avec succès' : 'Partition rendue privée'
         ]);
     }
+
     #[Route('/library', name: 'app_chordsheet_library', methods: ['GET'])]
     public function library(ChordsheetRepository $chordsheetRepository, Security $security): Response
     {
-        // Récupérer toutes les partitions publiques
-        $publicChordsheets = $chordsheetRepository->findBy(['isPublic' => true], ['createdAt' => 'DESC']);
+        // Récupérer toutes les partitions publiques, triées par date de publication (plus récente en premier)
+        $publicChordsheets = $chordsheetRepository->findBy(
+            ['isPublic' => true],
+            ['publishedAt' => 'DESC', 'createdAt' => 'DESC'] // Fallback sur createdAt si publishedAt est null
+        );
 
         return $this->render('chordsheet/library.html.twig', [
             'chordsheets' => $publicChordsheets,
