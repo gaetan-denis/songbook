@@ -3,20 +3,25 @@
 {% block title %}Compte supprimé{% endblock %}
 
 {% block body %}
-    <div class="container mt-5">
-        {% for label, messages in app.flashes %}
-            {% for message in messages %}
-                <div class="alert alert-{{ label == 'error' ? 'danger' : label }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endfor %}
+    <div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center  text-sand" >
+        <div class="w-100 bg-dark-blue" style="max-width: 500px">
 
-        <div class="d-flex justify-content-center text-dark">
-            <div class="bg-light p-5 rounded shadow text-center" style="max-width: 500px; width: 100%;">
-                <h1 class="mb-3">👋 Au revoir !</h1>
-                <p class="mb-4">Votre compte a été supprimé avec succès.</p>
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label == 'error' ? 'danger' : label }} shadow-sm rounded-pill text-center">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <div class="bg-sand text-dark p-5 rounded-4 shadow-lg text-center">
+                <h1 class="mb-3 display-6 text text-light"><i class="fas fa-person-walking-luggage"></i> Au revoir !</h1>
+                <p class="mb-4 fs-5 text text-light">Votre compte a bien été supprimé.</p>
+
+                <a href="{{ path('app_home') }}" class="btn btn-outline-sand px-4 py-2 mt-2">
+                    Retour à l’accueil
+                </a>
             </div>
         </div>
-    </div>
+
 {% endblock %}
