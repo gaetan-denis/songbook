@@ -46,11 +46,16 @@ final class ProfileController extends AbstractController
         // Si le rôle existe dans les labels, on l'affiche
         $roleLabel = $roleLabels[$role] ?? 'Rôle inconnu';
 
+        // Vérifier si l'utilisateur est administrateur
+        $isAdmin = in_array('ROLE_ADMIN', $roles);
+
         return $this->render('profile/index.html.twig', [
-            'role' => $roleLabel,  // Passer le rôle sous forme de label
+            'role' => $roleLabel,
             'user' => $user,
+            'isAdmin' => $isAdmin,
         ]);
     }
+
     #[Route('/profile/edit', name: 'app_profile_edit')]
     public function edit(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): Response
     {
@@ -60,7 +65,7 @@ final class ProfileController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Récupération du mot de passe s’il a été modifié
+            // Récupération du mot de passe s'il a été modifié
             $plainPassword = $form->get('plainPassword')->getData();
 
             if (!empty($plainPassword)) {
@@ -89,7 +94,7 @@ final class ProfileController extends AbstractController
         $data = [
             'id' => $user->getId(),
             'email' => $user->getEmail(),
-            'username' => $user->getUsername(), // Plutôt que getUserIdentifier()
+            'username' => $user->getUsername(),
             'roles' => $user->getRoles(),
             'created_at' => $user->getCreatedAt()?->format('Y-m-d H:i:s'),
             'last_connection' => $user->getLastConnection()?->format('Y-m-d H:i:s'),
@@ -127,6 +132,19 @@ final class ProfileController extends AbstractController
         /** @var User $user */
         $user = $security->getUser();
 
+        // PROTECTION ADMINISTRATEUR : Empêcher la suppression si l'utilisateur est admin
+        if (in_array('ROLE_ADMIN', $user->getRoles())) {
+            $this->addFlash('error', 'Impossible de supprimer un compte administrateur. Veuillez d\'abord transmettre vos privilèges à un autre utilisateur.');
+            return $this->redirectToRoute('app_profile');
+        }
+
+        // Vérification du token CSRF
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('delete_account', $token)) {
+            $this->addFlash('error', 'Token de sécurité invalide.');
+            return $this->redirectToRoute('app_profile');
+        }
+
         // Anonymiser les données de l'utilisateur
         $hashedPassword = $passwordHasher->hashPassword($user, 'anonymized');
         $user->anonymize($hashedPassword);
@@ -141,11 +159,10 @@ final class ProfileController extends AbstractController
         // Rediriger vers une route publique
         return $this->redirectToRoute('app_goodbye');
     }
+
     #[Route('/goodbye', name: 'app_goodbye')]
     public function goodbye(): Response
     {
         return $this->render('security/goodbye.html.twig');
     }
-
 }
-
