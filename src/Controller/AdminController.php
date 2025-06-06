@@ -3,17 +3,20 @@
 // AdminController.php
 namespace App\Controller;
 
+use App\Entity\Chordsheet;
 use App\Entity\User;
-use App\Form\UserType;
+use App\Repository\ChordsheetRepository;
 use App\Repository\RoleRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
+//
 
 // Utilise Annotation pour la route
 
@@ -28,7 +31,6 @@ final class AdminController extends AbstractController
 
     #[Route('/admin/users', name: 'app_admin_users')]
     #[IsGranted('ROLE_MODERATOR')]
-
     public function manageUsers(UserRepository $userRepository): Response
     {
         $users = $userRepository->findAll();
@@ -40,10 +42,24 @@ final class AdminController extends AbstractController
 
     #[Route('/admin/partitions', name: 'app_admin_partitions')]
     #[IsGranted('ROLE_MODERATOR')]
-    public function managePartitions(): Response
+    public function managePartitions(ChordsheetRepository $chordsheetRepository): Response
     {
-// Logique pour gérer les partitions
-        return $this->render('admin/partitions.html.twig');
+        // Récupérer toutes les partitions (publiques et privées) triées par date de création
+        $partitions = $chordsheetRepository->findBy([], ['createdAt' => 'DESC']);
+
+        // Calculer le nombre d'utilisateurs uniques
+        $uniqueUserIds = [];
+        foreach ($partitions as $partition) {
+            if ($partition->getUser()) { // Vérification de sécurité
+                $uniqueUserIds[$partition->getUser()->getId()] = true;
+            }
+        }
+        $uniqueUsersCount = count($uniqueUserIds);
+
+        return $this->render('admin/partitions.html.twig', [
+            'partitions' => $partitions,
+            'uniqueUsersCount' => $uniqueUsersCount,
+        ]);
     }
 
     #[Route('/admin/settings', name: 'app_admin_settings')]
@@ -153,12 +169,13 @@ final class AdminController extends AbstractController
     #[Route('/admin/user/{id}/edit-role', name: 'user_edit_role', methods: ['POST'])]
     #[IsGranted('ROLE_MODERATOR')]
     public function editRole(
-        Request $request,
-        User $user,
+        Request                $request,
+        User                   $user,
         EntityManagerInterface $em,
-        RoleRepository $roleRepository,
-        SessionInterface $session
-    ): Response {
+        RoleRepository         $roleRepository,
+        SessionInterface       $session
+    ): Response
+    {
         $this->denyAccessUnlessGranted('ROLE_MODERATOR');
 
         // Vérifie le token CSRF
@@ -282,5 +299,37 @@ final class AdminController extends AbstractController
 
         // Note: Pour déconnecter d'autres utilisateurs, il faudrait une approche plus complexe
         // impliquant un système de gestion de sessions centralisé
+    }
+    #[Route('/admin/partition/{id}/delete', name: 'admin_partition_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_MODERATOR')]
+    public function deletePartition(Chordsheet $chordsheet, Request $request, EntityManagerInterface $em): Response
+    {
+        // Vérification du token CSRF
+        if (!$this->isCsrfTokenValid('delete-partition-' . $chordsheet->getId(), $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+            return $this->redirectToRoute('app_admin_partitions');
+        }
+
+        try {
+            $partitionTitle = $chordsheet->getTitle();
+            $em->remove($chordsheet);
+            $em->flush();
+
+            $this->addFlash('success', 'Partition "' . $partitionTitle . '" supprimée avec succès.');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de la suppression de la partition.');
+        }
+
+        return $this->redirectToRoute('app_admin_partitions');
+    }
+
+// Nouvelle méthode pour voir les détails d'une partition
+    #[Route('/admin/partition/{id}', name: 'admin_partition_show', methods: ['GET'])]
+    #[IsGranted('ROLE_MODERATOR')]
+    public function showPartition(Chordsheet $chordsheet): Response
+    {
+        return $this->render('admin/partition/show.html.twig', [
+            'chordsheet' => $chordsheet,
+        ]);
     }
 }

@@ -1,8 +1,10 @@
 {% extends 'base.html.twig' %}
 
+
 {% block title %}Gestion des utilisateurs{% endblock %}
 
 {% block body %}
+
     {% set currentUser = app.user %}
     {% set roleLabels = {
         'ROLE_ADMIN': 'Administrateur',
@@ -10,18 +12,26 @@
         'ROLE_USER': 'Utilisateur'
     } %}
 
-    <div class="container mt-4">
-        <h1>Liste des utilisateurs</h1>
-
+    <div class="container mt-4 bg">
         {% for label, messages in app.flashes %}
             {% for message in messages %}
-                <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }}
+                    {{ label == 'success' ? 'custom-flash-success' : '' }}
+                    alert-dismissible fade show"
+                     role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         {% endfor %}
-
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-4 bg-dark-blue px-4 py-4">
+            <div>
+                <h1 class="h3 mb-0">
+                    <i class="fa-solid fa-user me-2"></i>Gestion des utilisateurs
+                </h1>
+                <p class="mb-0 text-light">Administration et modération des utilisateurs</p>
+            </div>
+        </div>
         <!-- Modal de confirmation pour succession administrative -->
         {% if app.request.query.get('confirm_admin_transfer') %}
             {% set targetUserId = app.request.query.get('confirm_admin_transfer') %}
@@ -50,8 +60,11 @@
 
                                 <p><strong>Vous êtes sur le point de :</strong></p>
                                 <ul class="list-unstyled ms-3">
-                                    <li><i class="fa-solid fa-arrow-up text-success me-2"></i>Promouvoir <strong>{{ targetUser.username }}</strong> au rang d'<strong>Administrateur</strong></li>
-                                    <li><i class="fa-solid fa-arrow-down text-danger me-2"></i>Vous rétrograder au rang d'<strong>Utilisateur standard</strong></li>
+                                    <li><i class="fa-solid fa-arrow-up text-success me-2"></i>Promouvoir
+                                        <strong>{{ targetUser.username }}</strong> au rang
+                                        d'<strong>Administrateur</strong></li>
+                                    <li><i class="fa-solid fa-arrow-down text-danger me-2"></i>Vous rétrograder au rang
+                                        d'<strong>Utilisateur standard</strong></li>
                                 </ul>
 
                                 <div class="alert alert-danger mt-3">
@@ -60,7 +73,9 @@
                                         <li>Vous perdrez <strong>tous</strong> vos privilèges administrateur</li>
                                         <li>Vous ne pourrez plus gérer les utilisateurs, rôles ou paramètres</li>
                                         <li>Seul le nouvel administrateur pourra vous redonner des privilèges</li>
-                                        <li><strong>Vous serez automatiquement déconnecté</strong> pour appliquer les changements</li>
+                                        <li><strong>Vous serez automatiquement déconnecté</strong> pour appliquer les
+                                            changements
+                                        </li>
                                         <li><strong>Cette action ne peut pas être annulée</strong></li>
                                     </ul>
                                 </div>
@@ -74,10 +89,12 @@
                                     <i class="fa-solid fa-times me-1"></i>Annuler
                                 </a>
 
-                                <form method="POST" action="{{ path('user_edit_role', {id: targetUser.id}) }}" class="d-inline">
+                                <form method="POST" action="{{ path('user_edit_role', {id: targetUser.id}) }}"
+                                      class="d-inline">
                                     <input type="hidden" name="role" value="ROLE_ADMIN">
                                     <input type="hidden" name="admin_succession_confirmed" value="1">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('edit-role-' ~ targetUser.id) }}">
+                                    <input type="hidden" name="_token"
+                                           value="{{ csrf_token('edit-role-' ~ targetUser.id) }}">
                                     <button type="submit" class="btn btn-danger">
                                         <i class="fa-solid fa-crown me-1"></i>Confirmer la Succession
                                     </button>
@@ -115,7 +132,8 @@
                         {% endif %}
                     </td>
                     <td class="d-flex gap-1">
-                        <a href="{{ path('user_profile', {'id': user.id}) }}" class="btn btn-sm btn-light" title="Profil">
+                        <a href="{{ path('user_profile', {'id': user.id}) }}" class="btn btn-sm btn-light"
+                           title="Profil">
                             <i class="fa-solid fa-user"></i>
                         </a>
 
@@ -127,9 +145,15 @@
                                         data-user-id="{{ user.id }}"
                                         data-user-name="{{ user.username }}"
                                         data-current-role="{{ user.role.name }}">
-                                    <option value="ROLE_USER" {{ user.role.name == 'ROLE_USER' ? 'selected' : '' }}>Utilisateur</option>
-                                    <option value="ROLE_MODERATOR" {{ user.role.name == 'ROLE_MODERATOR' ? 'selected' : '' }}>Modérateur</option>
-                                    <option value="ROLE_ADMIN" {{ user.role.name == 'ROLE_ADMIN' ? 'selected' : '' }}>Admin</option>
+                                    <option value="ROLE_USER" {{ user.role.name == 'ROLE_USER' ? 'selected' : '' }}>
+                                        Utilisateur
+                                    </option>
+                                    <option value="ROLE_MODERATOR" {{ user.role.name == 'ROLE_MODERATOR' ? 'selected' : '' }}>
+                                        Modérateur
+                                    </option>
+                                    <option value="ROLE_ADMIN" {{ user.role.name == 'ROLE_ADMIN' ? 'selected' : '' }}>
+                                        Admin
+                                    </option>
                                 </select>
                                 <input type="hidden" name="_token" value="{{ csrf_token('edit-role-' ~ user.id) }}">
                             </form>
@@ -149,18 +173,20 @@
                                   action="{{ path('user_ban', {'id': user.id}) }}"
                                   onsubmit="return confirm('{{ user.isBanned ? 'Réactiver' : 'Bannir' }} {{ user.username }} ?');">
                                 <input type="hidden" name="_token" value="{{ csrf_token('ban-user-' ~ user.id) }}">
-                                <button class="btn btn-sm btn-dark" title="{{ user.isBanned ? 'Réactiver' : 'Bannir' }}">
+                                <button class="btn btn-sm btn-dark"
+                                        title="{{ user.isBanned ? 'Réactiver' : 'Bannir' }}">
                                     <i class="fa-solid fa-ban"></i> {{ user.isBanned ? 'Réactiver' : 'Bannir' }}
                                 </button>
                             </form>
 
                         {% else %}
                             {# Affichage désactivé pour utilisateur courant #}
-                            <select class="form-select form-select-sm d-inline w-auto align-middle bg-secondary text-white border-0" disabled title="Impossible de modifier son propre rôle">
+                            <select class="form-select form-select-sm d-inline w-auto align-middle bg-secondary text-white border-0"
+                                    disabled title="Impossible de modifier son propre rôle">
                                 <option selected>{{ roleLabels[user.role.name] ?? user.role.name }}</option>
                             </select>
 
-                            <button class="btn btn-sm btn-secondary" disabled title="Action désactivée" >
+                            <button class="btn btn-sm btn-secondary" disabled title="Action désactivée">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
 
@@ -181,11 +207,11 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const roleSelectors = document.querySelectorAll('.role-selector');
 
-            roleSelectors.forEach(function(selector) {
-                selector.addEventListener('change', function() {
+            roleSelectors.forEach(function (selector) {
+                selector.addEventListener('change', function () {
                     const selectedRole = this.value;
                     const currentRole = this.dataset.currentRole;
                     const userName = this.dataset.userName;

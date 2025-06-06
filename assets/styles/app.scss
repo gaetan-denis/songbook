@@ -21,6 +21,17 @@ $font-primary: 'Lora', serif;
 
 // 3. Utilitaires
 
+//message- flash custom
+
+.custom-flash-success {
+    @extend .alert;
+    @extend .alert-success;
+
+    background-color: $color2;
+    color: #fff;
+    border: 1px solid $color2;
+}
+
 .btn-dark-blue {
     color: #fff; /* texte blanc */
     background-color: #2b3a44; /* fond dark blue */

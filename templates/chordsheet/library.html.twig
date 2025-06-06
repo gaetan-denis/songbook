@@ -83,14 +83,7 @@
 
                                     <!-- Bouton Supprimer (seulement pour les admins) -->
                                     {% if is_granted('ROLE_ADMIN') %}
-                                        <form method="post" action="{{ path('app_chordsheet_library_delete', {'id': chordsheet.id}) }}"
-                                              style="display: inline-block;"
-                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette partition de la bibliothèque ?')">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_library' ~ chordsheet.id) }}">
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                <i class="fas fa-trash me-1"></i> Supprimer
-                                            </button>
-                                        </form>
+
                                     {% endif %}
                                 {% else %}
                                     <!-- Message pour utilisateurs non connectés -->
