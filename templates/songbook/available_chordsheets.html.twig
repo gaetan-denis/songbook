@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter des partitions - {{ songbook.title }}{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="mx-auto col-md-10 col-lg-12 mt-4">
+            <div class="d-flex justify-content-between align-items-center mt-5 mb-4 bg-dark-blue px-4 py-4">
+                <h1>Ajouter des partitions à "{{ songbook.title }}"</h1>
+                <a href="{{ path('app_songbook_show', {id: songbook.id}) }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour au recueil
+                </a>
+            </div>
+
+            {# Barre de recherche #}
+{#            <div class="card mb-4">#}
+{#                <div class="card-body">#}
+{#                    <form method="get" class="row g-3">#}
+{#                        <div class="col-md-8">#}
+{#                            <input type="text"#}
+{#                                   class="form-control"#}
+{#                                   name="search"#}
+{#                                   placeholder="Rechercher une partition (titre, contenu...)"#}
+{#                                   value="{{ app.request.query.get('search') }}">#}
+{#                        </div>#}
+{#                        <div class="col-md-4">#}
+{#                            <button type="submit" class="btn btn-primary w-100">#}
+{#                                <i class="fas fa-search"></i> Rechercher#}
+{#                            </button>#}
+{#                        </div>#}
+{#                    </form>#}
+{#                </div>#}
+{#            </div>#}
+
+            {# Liste des partitions disponibles #}
+            {% if chordsheets|length > 0 %}
+                <div class="row">
+                    {% for chordsheet in chordsheets %}
+                        {# Vérifier si la partition est déjà dans le recueil #}
+                        {% set isInSongbook = false %}
+                        {% for sc in songbook.songbookChordsheets %}
+                            {% if sc.chordsheet.id == chordsheet.id %}
+                                {% set isInSongbook = true %}
+                            {% endif %}
+                        {% endfor %}
+
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100 {% if isInSongbook %}border-success{% endif %}">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        {{ chordsheet.title }}
+                                        {% if isInSongbook %}
+                                            <span class="badge bg-success ms-2">
+                                                <i class="fas fa-check"></i> Déjà ajouté
+                                            </span>
+                                        {% endif %}
+                                    </h6>
+
+                                    <div class="text-muted small mb-2">
+                                        <i class="fas fa-user"></i> {{ chordsheet.user.username }}
+                                        {% if chordsheet.isPublic %}
+                                            <span class="badge bg-success ms-2">Public</span>
+                                        {% else %}
+                                            <span class="badge bg-warning ms-2">Privé</span>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if chordsheet.content %}
+                                        <p class="card-text text-muted small">
+                                            {{ chordsheet.content|length > 100 ? chordsheet.content|slice(0, 100) ~ '...' : chordsheet.content }}
+                                        </p>
+                                    {% endif %}
+
+                                    <div class="text-muted small mb-3">
+                                        <i class="fas fa-calendar"></i> {{ chordsheet.createdAt|date('d/m/Y') }}
+                                    </div>
+                                </div>
+
+                                <div class="card-footer d-flex justify-content-between">
+                                    <a href="{{ path('app_chordsheet_show', {id: chordsheet.id}) }}"
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> Voir
+                                    </a>
+
+                                    {% if not isInSongbook %}
+                                        <form method="post"
+                                              action="{{ path('app_songbook_add_chordsheet', {
+                                                  id: songbook.id,
+                                                  chordsheetId: chordsheet.id
+                                              }) }}"
+                                              style="display: inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('add_chordsheet_' ~ songbook.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-plus"></i> Ajouter
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-success" disabled>
+                                            <i class="fas fa-check"></i> Ajouté
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {# Pagination si nécessaire #}
+                {% if chordsheets|length >= 20 %}
+                    <div class="d-flex justify-content-center mt-4">
+                        <p class="text-muted">Trop de résultats ? Utilisez la recherche pour affiner.</p>
+                    </div>
+                {% endif %}
+
+            {% else %}
+                <div class="alert alert-info">
+                    <h5>Aucune partition disponible</h5>
+                    {% if app.request.query.get('search') %}
+                        <p>Aucune partition ne correspond à votre recherche "{{ app.request.query.get('search') }}".</p>
+                        <a href="{{ path('app_songbook_available_chordsheets', {id: songbook.id}) }}"
+                           class="btn btn-primary">
+                            Voir toutes les partitions
+                        </a>
+                    {% else %}
+                        <p>Vous n'avez pas encore de partitions disponibles ou toutes vos partitions sont déjà dans ce recueil.</p>
+                        <a href="{{ path('app_chordsheet_new') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Créer une nouvelle partition
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# Actions #}
+            <div class="d-flex gap-2 mt-4">
+                <a href="{{ path('app_songbook_show', {id: songbook.id}) }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour au recueil
+                </a>
+                <a href="{{ path('app_chordsheet_new') }}" class="btn btn-green">
+                    <i class="fas fa-plus"></i> Créer une nouvelle partition
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
