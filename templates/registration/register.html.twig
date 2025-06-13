@@ -56,7 +56,11 @@
                             </div>
                             {{ form_errors(registrationForm.plainPassword.second) }}
                         </div>
+                        <div class="mb-3">
+                            <div class="h-captcha" data-sitekey="{{ hcaptcha_site_key }}"></div>
+                        </div>
 
+                        <script src="https://hcaptcha.com/1/api.js" async defer></script>
                         <div class="d-grid mt-3">
                             {{ form_row(registrationForm.submit, {'attr': {'class': 'btn btn-green w-100'}}) }}
                         </div>
