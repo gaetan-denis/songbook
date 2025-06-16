@@ -44,10 +44,10 @@ final class AdminController extends AbstractController
     #[IsGranted('ROLE_MODERATOR')]
     public function managePartitions(ChordsheetRepository $chordsheetRepository): Response
     {
-        // Récupérer toutes les partitions (publiques et privées) triées par date de création
-        $partitions = $chordsheetRepository->findBy([], ['createdAt' => 'DESC']);
+        // Récupérer UNIQUEMENT les partitions publiques triées par date de création
+        $partitions = $chordsheetRepository->findBy(['isPublic' => true], ['createdAt' => 'DESC']);
 
-        // Calculer le nombre d'utilisateurs uniques
+        // Calculer le nombre d'utilisateurs uniques (uniquement pour les partitions publiques)
         $uniqueUserIds = [];
         foreach ($partitions as $partition) {
             if ($partition->getUser()) { // Vérification de sécurité
