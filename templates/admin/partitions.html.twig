@@ -55,11 +55,6 @@
                             <td>
                                 <i class="fas fa-user me-1"></i>
                                 {{ chordsheet.user.username }}
-                                {% if is_granted('ROLE_ADMIN', chordsheet.user) %}
-                                    <span class="badge bg-danger ms-1">Admin</span>
-                                {% elseif is_granted('ROLE_MODERATOR', chordsheet.user) %}
-                                    <span class="badge bg-warning ms-1">Modérateur</span>
-                                {% endif %}
                             </td>
                             <td>
                                 {% if chordsheet.publishedAt %}
