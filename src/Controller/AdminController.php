@@ -207,6 +207,11 @@ final class AdminController extends AbstractController
         }
 
         $newRoleName = $request->request->get('role');
+        // ⚠️ PROTECTION : Seuls les admins peuvent promouvoir vers ROLE_ADMIN
+        if ($newRoleName === 'ROLE_ADMIN' && !$this->isGranted('ROLE_ADMIN')) {
+            $this->addFlash('error', 'Seuls les administrateurs peuvent promouvoir d\'autres administrateurs.');
+            return $this->redirectToRoute('app_admin_users');
+        }
 
         if (!in_array($newRoleName, ['ROLE_ADMIN', 'ROLE_MODERATOR', 'ROLE_USER'], true)) {
             $this->addFlash('danger', 'Rôle invalide.');
