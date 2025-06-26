@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espace d'administration{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="my-4">Bienvenue dans l'espace d'administration</h1>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card h-100 d-flex flex-column">
+                    <div class="card-header">
+                        Gestion des utilisateurs
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <p>Liste des utilisateurs avec option d'édition, suppression, attribution de rôles.</p>
+                        <a href="{{ path('app_admin_users') }}" class="btn btn-dark mt-2">Gérer les utilisateurs</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 d-flex flex-column">
+                    <div class="card-header">
+                        Gestion des partitions
+                    </div>
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <p>Gérer, ajouter ou supprimer des partitions musicales.</p>
+                        <a href="{{ path('app_admin_partitions') }}" class="btn btn-dark mt-2">Gérer les partitions</a>
+                    </div>
+                </div>
+            </div>
+            {% if is_granted('ROLE_ADMIN') %}
+                <div class="col-md-4">
+                    <div class="card h-100 d-flex flex-column">
+                        <div class="card-header">
+                            Paramètres avancés
+                        </div>
+                        <div class="card-body d-flex flex-column justify-content-between">
+                            <p>Accédez aux paramètres système ou autres configurations avancées.</p>
+                            <a href="{{ path('app_admin_settings') }}" class="btn btn-dark mt-2">Paramètres</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

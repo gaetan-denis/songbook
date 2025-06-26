@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ user.username }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="bg-white p-4 rounded shadow-sm">
+            <h1 class="text-center text-dark mb-4">Profil de {{ user.username }}</h1>
+
+            {# Avatar #}
+            {% if user.avatarUrl %}
+                <div class="mb-4 text-center">
+                    <img src="{{ user.avatarUrl }}" alt="Avatar de {{ user.username }}"
+                         class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                </div>
+            {% endif %}
+
+            <ul class="list-group mb-4">
+                <li class="list-group-item"><strong>ID :</strong> {{ user.id }}</li>
+                <li class="list-group-item"><strong>Nom d'utilisateur :</strong> {{ user.username }}</li>
+                <li class="list-group-item"><strong>Email :</strong> {{ user.email }}</li>
+                <li class="list-group-item">
+                    <strong>Rôle :</strong>
+                    {% if 'ROLE_ADMIN' in user.roles %}
+                        <span class="badge bg-danger">Administrateur</span>
+                    {% elseif 'ROLE_MODERATOR' in user.roles %}
+                        <span class="badge bg-warning text-dark">Modérateur</span>
+                    {% elseif 'ROLE_USER' in user.roles %}
+                        <span class="badge bg-secondary">Utilisateur</span>
+                    {% else %}
+                        <span class="badge bg-dark">Inconnu</span>
+                    {% endif %}
+                </li>
+                <li class="list-group-item">
+                    <strong>Dernière connexion :</strong>
+                    {% if user.lastConnection %}
+                        {{ user.lastConnection|date('d/m/Y à H:i', 'Europe/Brussels') }}
+                    {% else %}
+                        Jamais connecté
+                    {% endif %}
+                </li>
+                <li class="list-group-item">
+                    <strong>Statut :</strong>
+                    {% if user.isBanned %}
+                        <span class="text-danger fw-bold">Banni</span>
+                    {% else %}
+                        <span class="text-success fw-bold">Actif</span>
+                    {% endif %}
+                </li>
+            </ul>
+
+            <div class="text-center">
+                <a href="{{ path('app_admin_users') }}" class="btn btn-secondary">← Retour à la liste</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

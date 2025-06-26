@@ -1,0 +1,25 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+<div class="mb-3">
+    {{ form_label(form.title, null, {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.title) }}
+</div>
+
+<div class="mb-3">
+    {{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
+    {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+    {{ form_errors(form.description) }}
+</div>
+
+<div class="d-flex gap-2">
+    <button class="btn btn-dark-blue flex-fill" type="submit">
+        <i class="fas fa-save"></i> {{ button_label|default('Enregistrer')|raw }}
+    </button>
+
+    <a href="{{ path('app_songbook_index') }}" class="btn btn-secondary flex-fill">
+        <i class="fas fa-arrow-left"></i> Retour à la liste
+    </a>
+</div>
+
+{{ form_end(form) }}

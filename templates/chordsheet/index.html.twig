@@ -1,0 +1,346 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Tablatures{% endblock %}
+
+{% block body %}
+    <div class="container">
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show mt-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-4 bg-dark-blue px-4 py-4">
+            <h1 class="h3 mb-0">Mes tablatures</h1>
+            <a href="{{ path('app_chordsheet_new') }}" class="btn btn-primary bg-dark-blue border-light">
+                <i class="fas fa-plus me-2"></i> Créer une nouvelle tablature
+            </a>
+        </div>
+
+        {% if chordsheets is not empty %}
+            <div class="table-responsive mb-4">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Titre</th>
+                        <th>Statut</th>
+                        <th>Créé le</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for chordsheet in chordsheets %}
+                        <tr>
+                            <td>{{ chordsheet.title }}</td>
+                            <td>
+                                {% if chordsheet.isPublic %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-globe me-1"></i> Public
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-lock me-1"></i> Privé
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>{{ chordsheet.createdAt ? chordsheet.createdAt|date('d/m/Y H:i', 'Europe/Brussels') : '' }}</td>
+                            <td>
+                                <a href="{{ path('app_chordsheet_show', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-dark-blue">
+                                    <i class="fas fa-eye me-1"></i> Voir
+                                </a>
+                                <a href="{{ path('app_chordsheet_edit', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-dark">
+                                    <i class="fas fa-pen me-1"></i> Modifier
+                                </a>
+
+                                <!-- Bouton Publier/Dépublier -->
+                                <button class="btn btn-sm toggle-public-btn {% if chordsheet.isPublic %}btn-outline-warning{% else %}btn-outline-success{% endif %}"
+                                        data-chordsheet-id="{{ chordsheet.id }}"
+                                        data-is-public="{{ chordsheet.isPublic ? 'true' : 'false' }}"
+                                        data-csrf-token="{{ csrf_token('toggle_public' ~ chordsheet.id) }}">
+                                    {% if chordsheet.isPublic %}
+                                        <i class="fas fa-eye-slash me-1"></i> Rendre privée
+                                    {% else %}
+                                        <i class="fas fa-globe me-1"></i> Publier
+                                    {% endif %}
+                                </button>
+
+                                <a href="{{ path('app_chordsheet_export', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-file-download me-1"></i> Exporter CHORDPRO
+                                </a>
+                                <button class="btn btn-sm btn-outline-warning export-pdf-btn"
+                                        data-chordsheet-id="{{ chordsheet.id }}"
+                                        data-chordsheet-title="{{ chordsheet.title }}"
+                                        data-chordsheet-content="{{ chordsheet.content|e('html_attr') }}">
+                                    <i class="fas fa-file-pdf me-1"></i> Export PDF
+                                </button>
+                                {{ include('chordsheet/_delete_form.html.twig', { chordsheet: chordsheet }) }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-warning mb-4" role="alert">
+                Aucune tablatures trouvée.
+            </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Ajouter jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Fonction pour parser le ChordPro pour le PDF
+            function parseChordProForPdf(text) {
+                const lines = text.split('\n');
+                const songData = {
+                    title: '',
+                    artist: '',
+                    subtitle: '',
+                    capo: '',
+                    key: '',
+                    year: '',
+                    sections: []
+                };
+
+                let currentSection = null;
+                let currentSectionType = 'verse';
+
+                lines.forEach(line => {
+                    const trimmed = line.trim();
+
+                    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+                        const directive = trimmed.slice(1, -1).trim();
+
+                        if (directive.startsWith('title:')) {
+                            songData.title = directive.slice(6).trim();
+                        } else if (directive.startsWith('artist:')) {
+                            songData.artist = directive.slice(7).trim();
+                        } else if (directive.startsWith('subtitle:')) {
+                            songData.subtitle = directive.slice(9).trim();
+                        } else if (directive.startsWith('capo:')) {
+                            songData.capo = directive.slice(5).trim();
+                        } else if (directive.startsWith('key:')) {
+                            songData.key = directive.slice(4).trim();
+                        } else if (directive.startsWith('year:')) {
+                            songData.year = directive.slice(5).trim();
+                        } else if (directive.startsWith('start_of_')) {
+                            const sectionType = directive.replace('start_of_', '').split(':')[0];
+                            const label = directive.includes(':') ? directive.split(':')[1].trim() : sectionType;
+                            currentSection = {
+                                type: sectionType,
+                                label: label,
+                                lines: []
+                            };
+                            currentSectionType = sectionType;
+                        } else if (directive.startsWith('end_of_')) {
+                            if (currentSection) {
+                                songData.sections.push(currentSection);
+                                currentSection = null;
+                            }
+                        }
+                        return;
+                    }
+
+                    // Si pas dans une section définie, créer une section par défaut
+                    if (!currentSection && trimmed) {
+                        currentSection = {
+                            type: 'verse',
+                            label: 'Couplet',
+                            lines: []
+                        };
+                    }
+
+                    if (currentSection) {
+                        // Parser les accords et paroles
+                        let chordLine = '';
+                        let lyricLine = '';
+                        let i = 0;
+
+                        while (i < line.length) {
+                            if (line[i] === '[') {
+                                const end = line.indexOf(']', i);
+                                if (end !== -1) {
+                                    const chord = line.slice(i + 1, end);
+                                    const chordPos = lyricLine.length;
+                                    while (chordLine.length < chordPos) {
+                                        chordLine += ' ';
+                                    }
+                                    chordLine += chord;
+                                    i = end + 1;
+                                } else {
+                                    lyricLine += line[i];
+                                    i++;
+                                }
+                            } else {
+                                lyricLine += line[i];
+                                if (chordLine.length < lyricLine.length) {
+                                    chordLine += ' ';
+                                }
+                                i++;
+                            }
+                        }
+
+                        if (chordLine.trim() || lyricLine.trim()) {
+                            currentSection.lines.push({
+                                chords: chordLine,
+                                lyrics: lyricLine
+                            });
+                        }
+                    }
+                });
+
+                // Ajouter la dernière section si elle n'a pas été fermée
+                if (currentSection && currentSection.lines.length > 0) {
+                    songData.sections.push(currentSection);
+                }
+
+                return songData;
+            }
+
+            // Fonction pour exporter en PDF
+            function exportToPdf(content, title) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                const songData = parseChordProForPdf(content);
+                let y = 20;
+                const pageHeight = doc.internal.pageSize.height;
+                const margin = 20;
+
+                // Titre
+                if (songData.title || title) {
+                    doc.setFontSize(18);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(songData.title || title, margin, y);
+                    y += 15;
+                }
+
+                // Artiste
+                if (songData.artist) {
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'normal');
+                    doc.text(`Artiste: ${songData.artist}`, margin, y);
+                    y += 10;
+                }
+
+                // Informations supplémentaires
+                doc.setFontSize(10);
+                if (songData.key) {
+                    doc.text(`Tonalité: ${songData.key}`, margin, y);
+                    y += 8;
+                }
+                if (songData.capo) {
+                    doc.text(`Capo: ${songData.capo}`, margin, y);
+                    y += 8;
+                }
+
+                y += 10;
+
+                // Sections
+                songData.sections.forEach(section => {
+                    // Vérifier s'il faut une nouvelle page
+                    if (y > pageHeight - 50) {
+                        doc.addPage();
+                        y = 20;
+                    }
+
+                    // Titre de section
+                    doc.setFontSize(12);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(section.label + ':', margin, y);
+                    y += 10;
+
+                    // Lignes de la section
+                    doc.setFontSize(10);
+                    doc.setFont('courier', 'normal');
+
+                    section.lines.forEach(line => {
+                        if (y > pageHeight - 30) {
+                            doc.addPage();
+                            y = 20;
+                        }
+
+                        // Accords en bleu et gras
+                        if (line.chords.trim()) {
+                            doc.setTextColor(0, 0, 255);
+                            doc.setFont('courier', 'bold');
+                            doc.text(line.chords, margin + 10, y);
+                            y += 6;
+                        }
+
+                        // Paroles en noir
+                        if (line.lyrics.trim()) {
+                            doc.setTextColor(0, 0, 0);
+                            doc.setFont('courier', 'normal');
+                            doc.text(line.lyrics, margin + 10, y);
+                            y += 6;
+                        }
+
+                        y += 2;
+                    });
+
+                    y += 8;
+                });
+
+                // Générer le nom de fichier
+                let filename = songData.title || title || 'partition';
+                if (!filename.toLowerCase().endsWith('.pdf')) {
+                    filename += '.pdf';
+                }
+
+                doc.save(filename);
+            }
+
+            // Event listener pour les boutons d'export PDF
+            document.querySelectorAll('.export-pdf-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.dataset.chordsheetContent;
+                    const title = button.dataset.chordsheetTitle;
+                    exportToPdf(content, title);
+                });
+            });
+
+            // Event listener pour les boutons de publication/dépublication - MODIFIÉ
+            document.querySelectorAll('.toggle-public-btn').forEach(button => {
+                button.addEventListener('click', async () => {
+                    const chordsheetId = button.dataset.chordsheetId;
+                    const isPublic = button.dataset.isPublic === 'true';
+                    const csrfToken = button.dataset.csrfToken;
+
+                    // Désactiver le bouton pendant la requête
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Traitement...';
+
+                    try {
+                        const response = await fetch(`/chordsheet/${chordsheetId}/toggle-public`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `_token=${encodeURIComponent(csrfToken)}`
+                        });
+
+                        const data = await response.json();
+
+                        // Qu'il y ait succès ou erreur, on recharge la page
+                        // Le message flash sera affiché par le serveur
+                        location.reload();
+
+                    } catch (error) {
+                        console.error('Erreur:', error);
+                        // Même en cas d'erreur, on recharge - le serveur peut gérer l'erreur
+                        location.reload();
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

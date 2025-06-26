@@ -1,0 +1,367 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Bibliothèque de Partitions{% endblock %}
+
+{% block body %}
+    <div class="container">
+
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show mt-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="d-flex justify-content-between align-items-center mt-5 mb-4 bg-dark-blue px-4 py-4">
+            <div>
+                <h1 class="h3 mb-0">Bibliothèque de Partitions</h1>
+                <p class="mb-0 text-light">Découvrez les partitions partagées par la communauté</p>
+            </div>
+            {% if currentUser %}
+                <a href="{{ path('app_chordsheet_index') }}" class="btn btn-outline-light">
+                    <i class="fas fa-user me-2"></i> Mes partitions
+                </a>
+            {% else %}
+                <div class="text-light">
+                    <small><i class="fas fa-info-circle me-1"></i> Connectez-vous pour télécharger les partitions</small>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if chordsheets is not empty %}
+            <div class="table-responsive mb-4">
+                <table class="table table-striped table-hover align-middle">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Titre</th>
+                        <th>Auteur</th>
+                        <th>Publié le</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for chordsheet in chordsheets %}
+                        <tr>
+                            <td>
+                                <strong>{{ chordsheet.title }}</strong>
+                            </td>
+                            <td>
+                                <i class="fas fa-user me-1"></i>
+                                {{ chordsheet.user.username }}
+                            </td>
+                            <td>
+                                {# Afficher publishedAt si disponible, sinon createdAt comme fallback #}
+                                {% if chordsheet.publishedAt %}
+                                    {{ chordsheet.publishedAt|date('d/m/Y H:i', 'Europe/Brussels') }}
+                                {% elseif chordsheet.createdAt %}
+                                    {{ chordsheet.createdAt|date('d/m/Y H:i', 'Europe/Brussels') }}
+                                    <small class="text-muted">(créé le)</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <!-- Bouton Voir (toujours visible) -->
+                                <a href="{{ path('app_chordsheet_show', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye me-1"></i> Voir
+                                </a>
+
+                                {% if currentUser %}
+                                    <!-- Boutons pour utilisateurs connectés -->
+
+                                    <!-- Boutons de téléchargement -->
+                                    <a href="{{ path('app_chordsheet_library_export', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-file-download me-1"></i> CHORDPRO
+                                    </a>
+
+                                    <button class="btn btn-sm btn-outline-warning export-pdf-btn"
+                                            data-chordsheet-id="{{ chordsheet.id }}"
+                                            data-chordsheet-title="{{ chordsheet.title }}"
+                                            data-chordsheet-content="{{ chordsheet.content|e('html_attr') }}">
+                                        <i class="fas fa-file-pdf me-1"></i> PDF
+                                    </button>
+
+                                    <!-- Bouton Supprimer (seulement pour les admins) -->
+                                    {% if is_granted('ROLE_ADMIN') %}
+
+                                    {% endif %}
+                                {% else %}
+                                    <!-- Message pour utilisateurs non connectés -->
+                                    <span class="text-muted">
+                                        <i class="fas fa-lock me-1"></i>
+                                        <small>Connectez-vous pour télécharger</small>
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Statistiques -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <i class="fas fa-chart-bar me-2"></i> Statistiques de la Bibliothèque
+                            </h5>
+                            <p class="card-text">
+                                <strong>{{ chordsheets|length }}</strong> partition(s) publique(s) disponible(s)
+                            </p>
+                            {% if not currentUser %}
+                                <p class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Créez un compte pour partager vos propres partitions et accéder aux téléchargements !
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info mb-4" role="alert">
+                <h4 class="alert-heading">
+                    <i class="fas fa-info-circle me-2"></i> Aucune partition publique
+                </h4>
+                <p>La bibliothèque ne contient pas encore de partitions publiques.</p>
+                {% if currentUser %}
+                    <hr>
+                    <p class="mb-0">
+                        Vous pouvez être le premier à partager une partition !
+                        <a href="{{ path('app_chordsheet_index') }}" class="btn btn-sm btn-primary ms-2">
+                            Voir mes partitions
+                        </a>
+                    </p>
+                {% else %}
+                    <hr>
+                    <p class="mb-0">
+                        Connectez-vous pour créer et partager vos propres partitions !
+                    </p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Ajouter jsPDF pour l'export PDF -->
+    {% if currentUser %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                // Fonction pour parser le ChordPro pour le PDF (même que dans l'index)
+                function parseChordProForPdf(text) {
+                    const lines = text.split('\n');
+                    const songData = {
+                        title: '',
+                        artist: '',
+                        subtitle: '',
+                        capo: '',
+                        key: '',
+                        year: '',
+                        sections: []
+                    };
+
+                    let currentSection = null;
+                    let currentSectionType = 'verse';
+
+                    lines.forEach(line => {
+                        const trimmed = line.trim();
+
+                        if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+                            const directive = trimmed.slice(1, -1).trim();
+
+                            if (directive.startsWith('title:')) {
+                                songData.title = directive.slice(6).trim();
+                            } else if (directive.startsWith('artist:')) {
+                                songData.artist = directive.slice(7).trim();
+                            } else if (directive.startsWith('subtitle:')) {
+                                songData.subtitle = directive.slice(9).trim();
+                            } else if (directive.startsWith('capo:')) {
+                                songData.capo = directive.slice(5).trim();
+                            } else if (directive.startsWith('key:')) {
+                                songData.key = directive.slice(4).trim();
+                            } else if (directive.startsWith('year:')) {
+                                songData.year = directive.slice(5).trim();
+                            } else if (directive.startsWith('start_of_')) {
+                                const sectionType = directive.replace('start_of_', '').split(':')[0];
+                                const label = directive.includes(':') ? directive.split(':')[1].trim() : sectionType;
+                                currentSection = {
+                                    type: sectionType,
+                                    label: label,
+                                    lines: []
+                                };
+                                currentSectionType = sectionType;
+                            } else if (directive.startsWith('end_of_')) {
+                                if (currentSection) {
+                                    songData.sections.push(currentSection);
+                                    currentSection = null;
+                                }
+                            }
+                            return;
+                        }
+
+                        // Si pas dans une section définie, créer une section par défaut
+                        if (!currentSection && trimmed) {
+                            currentSection = {
+                                type: 'verse',
+                                label: 'Couplet',
+                                lines: []
+                            };
+                        }
+
+                        if (currentSection) {
+                            // Parser les accords et paroles
+                            let chordLine = '';
+                            let lyricLine = '';
+                            let i = 0;
+
+                            while (i < line.length) {
+                                if (line[i] === '[') {
+                                    const end = line.indexOf(']', i);
+                                    if (end !== -1) {
+                                        const chord = line.slice(i + 1, end);
+                                        const chordPos = lyricLine.length;
+                                        while (chordLine.length < chordPos) {
+                                            chordLine += ' ';
+                                        }
+                                        chordLine += chord;
+                                        i = end + 1;
+                                    } else {
+                                        lyricLine += line[i];
+                                        i++;
+                                    }
+                                } else {
+                                    lyricLine += line[i];
+                                    if (chordLine.length < lyricLine.length) {
+                                        chordLine += ' ';
+                                    }
+                                    i++;
+                                }
+                            }
+
+                            if (chordLine.trim() || lyricLine.trim()) {
+                                currentSection.lines.push({
+                                    chords: chordLine,
+                                    lyrics: lyricLine
+                                });
+                            }
+                        }
+                    });
+
+                    // Ajouter la dernière section si elle n'a pas été fermée
+                    if (currentSection && currentSection.lines.length > 0) {
+                        songData.sections.push(currentSection);
+                    }
+
+                    return songData;
+                }
+
+                // Fonction pour exporter en PDF
+                function exportToPdf(content, title) {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+
+                    const songData = parseChordProForPdf(content);
+                    let y = 20;
+                    const pageHeight = doc.internal.pageSize.height;
+                    const margin = 20;
+
+                    // Titre
+                    if (songData.title || title) {
+                        doc.setFontSize(18);
+                        doc.setFont(undefined, 'bold');
+                        doc.text(songData.title || title, margin, y);
+                        y += 15;
+                    }
+
+                    // Artiste
+                    if (songData.artist) {
+                        doc.setFontSize(12);
+                        doc.setFont(undefined, 'normal');
+                        doc.text(`Artiste: ${songData.artist}`, margin, y);
+                        y += 10;
+                    }
+
+                    // Informations supplémentaires
+                    doc.setFontSize(10);
+                    if (songData.key) {
+                        doc.text(`Tonalité: ${songData.key}`, margin, y);
+                        y += 8;
+                    }
+                    if (songData.capo) {
+                        doc.text(`Capo: ${songData.capo}`, margin, y);
+                        y += 8;
+                    }
+
+                    y += 10;
+
+                    // Sections
+                    songData.sections.forEach(section => {
+                        // Vérifier s'il faut une nouvelle page
+                        if (y > pageHeight - 50) {
+                            doc.addPage();
+                            y = 20;
+                        }
+
+                        // Titre de section
+                        doc.setFontSize(12);
+                        doc.setFont(undefined, 'bold');
+                        doc.text(section.label + ':', margin, y);
+                        y += 10;
+
+                        // Lignes de la section
+                        doc.setFontSize(10);
+                        doc.setFont('courier', 'normal');
+
+                        section.lines.forEach(line => {
+                            if (y > pageHeight - 30) {
+                                doc.addPage();
+                                y = 20;
+                            }
+
+                            // Accords en bleu et gras
+                            if (line.chords.trim()) {
+                                doc.setTextColor(0, 0, 255);
+                                doc.setFont('courier', 'bold');
+                                doc.text(line.chords, margin + 10, y);
+                                y += 6;
+                            }
+
+                            // Paroles en noir
+                            if (line.lyrics.trim()) {
+                                doc.setTextColor(0, 0, 0);
+                                doc.setFont('courier', 'normal');
+                                doc.text(line.lyrics, margin + 10, y);
+                                y += 6;
+                            }
+
+                            y += 2;
+                        });
+
+                        y += 8;
+                    });
+
+                    // Générer le nom de fichier
+                    let filename = songData.title || title || 'partition';
+                    if (!filename.toLowerCase().endsWith('.pdf')) {
+                        filename += '.pdf';
+                    }
+
+                    doc.save(filename);
+                }
+
+                // Event listener pour les boutons d'export PDF
+                document.querySelectorAll('.export-pdf-btn').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const content = button.dataset.chordsheetContent;
+                        const title = button.dataset.chordsheetTitle;
+                        exportToPdf(content, title);
+                    });
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}

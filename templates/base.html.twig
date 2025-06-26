@@ -1,17 +1,39 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Welcome!{% endblock %}</title>
+    <meta name="description" content="Page principale de Songbook" />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('android-chrome-192x192.png') }}">
+    <link rel="icon" type="image/png" sizes="512x512" href="{{ asset('android-chrome-512x512.png') }}">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}  {# Inclut le CSS généré par Webpack Encore #}
+    {% endblock %}
+</head>
+<body>
+<a href="#main-content" class="skip-link">Aller au contenu principal</a>
+<div class="background-image" aria-hidden="true"></div> {# Fond décoratif #}
+<div class="page-container">
+    {% include '_partials/navbar.html.twig' %}
+    <main  id="main-content" class="content-wrap">
         {% block body %}{% endblock %}
-    </body>
+    </main>
+
+    {% include '_partials/footer.html.twig' %}
+</div>
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
+</body>
 </html>
+
+
+

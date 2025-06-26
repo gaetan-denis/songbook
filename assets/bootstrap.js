@@ -1,5 +1,11 @@
-import { startStimulusApp } from '@symfony/stimulus-bundle';
+import { Application } from '@hotwired/stimulus';
+import { definitionsFromContext } from '@hotwired/stimulus-webpack-helpers';
 
-const app = startStimulusApp();
-// register any custom, 3rd party controllers here
-// app.register('some_controller_name', SomeImportedController);
+// Démarre l'application Stimulus
+const application = Application.start();
+
+// Charge automatiquement les contrôleurs depuis le dossier ./controllers
+const context = require.context('./controllers', true, /\.js$/);
+application.load(definitionsFromContext(context));
+
+console.log('Stimulus app started (via Webpack)');

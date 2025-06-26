@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le rôle de {{ user.username }}{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Modifier le rôle de {{ user.username }}</h1>
+
+        <form method="post">
+            <div class="mb-3">
+                <label for="role" class="form-label">Nouveau rôle</label>
+                <select name="role" id="role" class="form-select">
+                    <option value="ROLE_USER" {% if 'ROLE_USER' in user.roles %}selected{% endif %}>Utilisateur</option>
+                    <option value="ROLE_MODERATOR" {% if 'ROLE_MODERATOR' in user.roles %}selected{% endif %}>Modérateur</option>
+                    <option value="ROLE_ADMIN" {% if 'ROLE_ADMIN' in user.roles %}selected{% endif %}>Administrateur</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="{{ path('user_profile', {id: user.id}) }}" class="btn btn-secondary">Annuler</a>
+        </form>
+    </div>
+{% endblock %}

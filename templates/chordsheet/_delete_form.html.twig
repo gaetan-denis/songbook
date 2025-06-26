@@ -1,0 +1,52 @@
+{# templates/chordsheet/_delete_form.html.twig #}
+<button class="btn btn-sm btn-outline-danger"
+        data-bs-toggle="modal"
+        data-bs-target="#deleteModal{{ chordsheet.id }}"
+        data-chordsheet-title="{{ chordsheet.title }}">
+    <i class="fas fa-trash-alt me-1"></i> Supprimer
+</button>
+
+<!-- Modale de confirmation de suppression -->
+<div class="modal fade" id="deleteModal{{ chordsheet.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ chordsheet.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel{{ chordsheet.id }}">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmer la suppression
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-trash-alt text-danger fs-1 me-3"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">Êtes-vous sûr de vouloir supprimer cette tablature ?</h6>
+                        <p class="mb-0 text-muted">
+                            <strong>"{{ chordsheet.title }}"</strong>
+                        </p>
+                        <small class="text-danger">
+                            <i class="fas fa-exclamation-circle me-1"></i>
+                            Cette action est irréversible !
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Annuler
+                </button>
+                <form method="post"
+                      action="{{ path('app_chordsheet_delete', {'id': chordsheet.id}) }}"
+                      style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ chordsheet.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-1"></i> Supprimer définitivement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

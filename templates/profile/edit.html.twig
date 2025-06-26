@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Songbook | Modifier mon profil{% endblock %}
+
+{% block body %}
+    {% for label, messages in app.flashes %}
+        {% set bootstrapClass = label == 'error' ? 'danger' : (label == 'success' ? 'success' : 'info') %}
+        {% for message in messages %}
+            <div class="alert alert-{{ bootstrapClass }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header text-center bg-light">
+                        <h2 class="mb-0">Modifier mon profil</h2>
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(form) }}
+                        {{ form_row(form.username) }}
+                        {{ form_row(form.email) }}
+                        {{ form_row(form.plainPassword) }}
+                        {{ form_row(form.avatarUrl) }}
+
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-dark w-100">Mettre à jour</button>
+                        </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
