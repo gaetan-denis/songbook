@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Songbook;
+use App\Entity\SongbookChordsheet;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,4 +41,21 @@ class SongbookRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    /**
+     * Récupère les relations SongbookChordsheet d'un songbook triées par position
+     */
+    public function getSongbookChordsheetsOrdered(Songbook $songbook): array
+    {
+        return $this->getEntityManager()
+            ->getRepository(SongbookChordsheet::class)
+            ->createQueryBuilder('sc')
+            ->leftJoin('sc.chordsheet', 'c')
+            ->addSelect('c')
+            ->where('sc.songbook = :songbook')
+            ->setParameter('songbook', $songbook)
+            ->orderBy('sc.position', 'ASC')
+            ->addOrderBy('sc.addedAt', 'ASC') // Fallback si position est nulle
+            ->getQuery()
+            ->getResult();
+    }
 }

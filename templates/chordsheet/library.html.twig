@@ -51,7 +51,15 @@
                                 <i class="fas fa-user me-1"></i>
                                 {{ chordsheet.user.username }}
                             </td>
-                            <td>{{ chordsheet.createdAt ? chordsheet.createdAt|date('d/m/Y H:i', 'Europe/Brussels') : '' }}</td>
+                            <td>
+                                {# Afficher publishedAt si disponible, sinon createdAt comme fallback #}
+                                {% if chordsheet.publishedAt %}
+                                    {{ chordsheet.publishedAt|date('d/m/Y H:i', 'Europe/Brussels') }}
+                                {% elseif chordsheet.createdAt %}
+                                    {{ chordsheet.createdAt|date('d/m/Y H:i', 'Europe/Brussels') }}
+                                    <small class="text-muted">(créé le)</small>
+                                {% endif %}
+                            </td>
                             <td>
                                 <!-- Bouton Voir (toujours visible) -->
                                 <a href="{{ path('app_chordsheet_show', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-primary">
@@ -60,8 +68,6 @@
 
                                 {% if currentUser %}
                                     <!-- Boutons pour utilisateurs connectés -->
-
-
 
                                     <!-- Boutons de téléchargement -->
                                     <a href="{{ path('app_chordsheet_library_export', {'id': chordsheet.id}) }}" class="btn btn-sm btn-outline-success">

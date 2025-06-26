@@ -21,6 +21,17 @@ $font-primary: 'Lora', serif;
 
 // 3. Utilitaires
 
+//message- flash custom
+
+.custom-flash-success {
+    @extend .alert;
+    @extend .alert-success;
+
+    background-color: $color2;
+    color: #fff;
+    border: 1px solid $color2;
+}
+
 .btn-dark-blue {
     color: #fff; /* texte blanc */
     background-color: #2b3a44; /* fond dark blue */
@@ -70,6 +81,57 @@ $font-primary: 'Lora', serif;
     color: #fff; /* texte blanc au survol */
     background-color: $color3; /* fond bleu foncé au survol */
     border-color: $color3;
+}
+
+// Bouton plein : fond sable doré
+.btn-sand {
+    color: #fff; // texte blanc
+    background-color: $color4; // fond sable
+    border: 1px solid $color4;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+
+    &:hover,
+    &:focus,
+    &:active {
+        background-color: darken($color4, 10%);
+        border-color: darken($color4, 10%);
+        color: #fff;
+        box-shadow: 0 0 0 0.25rem rgba(208, 180, 130, 0.5); // halo au focus
+    }
+
+    &:disabled,
+    &.disabled {
+        background-color: #ccc;
+        border-color: #ccc;
+        color: #eee;
+        pointer-events: none;
+        opacity: 0.65;
+    }
+}
+
+// Bouton contour : texte sable doré
+.btn-outline-sand {
+    @extend .btn;
+    @extend .btn-outline-light;
+    color: $color4;
+    border: 1px solid $color4;
+    background-color: transparent;
+    transition: all 0.3s ease;
+
+    &:hover,
+    &:focus {
+        color: #fff;
+        background-color: $color4;
+        border-color: $color4;
+    }
+
+    &:disabled,
+    &.disabled {
+        color: #999;
+        border-color: #999;
+        pointer-events: none;
+        opacity: 0.65;
+    }
 }
 
 .btn-outline-pink {

@@ -233,24 +233,27 @@
                     output.innerHTML = renderChordPro(input.value);
                 });
 
-                // Mise à jour de la partition
-                // Mise à jour de la partition avec validation côté client et gestion d'erreurs améliorée
+                // Mise à jour de la partition - MODIFIÉE (sans alerts)
                 updateBtn.addEventListener('click', async () => {
                     const content = input.value.trim();
                     const filename = filenameInput.value.trim();
 
-                    // Validation côté client
+                    // Validation côté client - on garde les validations pour l'UX
                     if (!filename) {
-                        alert("Le titre ne peut pas être vide.");
                         filenameInput.focus();
+                        filenameInput.classList.add('is-invalid');
                         return;
                     }
 
                     if (!content) {
-                        alert("Le contenu ne peut pas être vide.");
                         input.focus();
+                        input.classList.add('is-invalid');
                         return;
                     }
+
+                    // Retirer les classes d'erreur si validation OK
+                    filenameInput.classList.remove('is-invalid');
+                    input.classList.remove('is-invalid');
 
                     // Désactiver le bouton pendant la mise à jour
                     updateBtn.disabled = true;
@@ -268,21 +271,16 @@
                         const data = await response.json();
 
                         if (response.ok) {
-                            alert("La partition \"" + data.filename + "\" a été mise à jour avec succès !");
-                            // Rediriger vers la page de visualisation
+                            // Redirection immédiate vers l'index - le message flash sera affiché là-bas
                             window.location.href = '/chordsheet';
                         } else {
-                            // Afficher le message d'erreur spécifique du serveur
-                            const errorMessage = data.error || "Erreur lors de la mise à jour";
-                            alert(errorMessage);
+                            // En cas d'erreur, on redirige aussi mais le serveur aura mis un message flash d'erreur
+                            window.location.href = '/chordsheet';
                         }
                     } catch (error) {
                         console.error('Erreur:', error);
-                        alert("Erreur de communication avec le serveur");
-                    } finally {
-                        // Réactiver le bouton
-                        updateBtn.disabled = false;
-                        updateBtn.textContent = "Mettre à jour";
+                        // Même en cas d'erreur réseau, on redirige - vous pouvez gérer ça côté serveur
+                        window.location.href = '/chordsheet';
                     }
                 });
 

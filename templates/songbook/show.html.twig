@@ -1,35 +1,232 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Songbook{% endblock %}
+{% block title %}{{ songbook.title }} - Songbook{% endblock %}
 
 {% block body %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
     <div class="container">
-        <div class="mx-auto col-md-6 col-lg-5 mt-4">
-            <h1 class="mb-4">Songbook</h1>
+        <div class="mx-auto col-md-8 col-lg-10 mt-4">
+            <h1 class="d-flex justify-content-between align-items-center mt-5 mb-4 bg-dark-blue px-4 py-4">{{ songbook.title }}</h1>
 
-            <table class="table table-bordered">
-                <tbody>
-                <tr>
-                    <th>Id</th>
-                    <td>{{ songbook.id }}</td>
-                </tr>
-                <tr>
-                    <th>Title</th>
-                    <td>{{ songbook.title }}</td>
-                </tr>
-                <tr>
-                    <th>Description</th>
-                    <td>{{ songbook.description }}</td>
-                </tr>
-                <tr>
-                    <th>Created At</th>
-                    <td>{{ songbook.createdAt ? songbook.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                </tr>
-                </tbody>
-            </table>
+            {# Informations du songbook #}
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Informations du recueil</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Description:</strong> {{ songbook.description|default('Aucune description') }}</p>
+                            <p><strong>Créé le:</strong> {{ songbook.createdAt ? songbook.createdAt|date('d/m/Y à H:i') : '' }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Nombre de partitions:</strong> {{ songbook.songbookChordsheets|length }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <div class="d-flex gap-2">
-                <a href="{{ path('app_songbook_index') }}" class="btn btn-secondary flex-grow-1">← Retour à la liste</a>
+            {# Actions principales #}
+            <div class="d-flex justify-content-between align-items-center mt-5 mb-4 bg-dark-blue px-4 py-4">
+                <h3>Partitions du recueil</h3>
+                <div class="btn-group">
+                    <a href="{{ path('app_songbook_available_chordsheets', {id: songbook.id}) }}"
+                       class="btn btn-green">
+                        <i class="fas fa-plus"></i> Ajouter une partition
+                    </a>
+                    <a href="{{ path('app_songbook_edit', {id: songbook.id}) }}"
+                       class="btn btn-secondary">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                </div>
+            </div>
+
+            {# Liste des partitions #}
+            {% set songbookChordsheets = songbook.songbookChordsheets|sort((a, b) => a.position <=> b.position) %}
+
+            {% if songbookChordsheets|length > 0 %}
+                <div class="card">
+                    <div class="card-body">
+                        <div id="chordsheets-list" class="list-group list-group-flush">
+                            {% for songbookChordsheet in songbookChordsheets %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center"
+                                     data-id="{{ songbookChordsheet.id }}">
+                                    <div class="d-flex align-items-center flex-grow-1">
+                                        {# Poignée de glissement #}
+                                        <div class="drag-handle me-3" style="cursor: move;">
+                                            <i class="fas fa-grip-vertical text-muted"></i>
+                                        </div>
+
+                                        {# Numéro de position #}
+                                        <span class="badge bg-secondary me-3">{{ songbookChordsheet.position }}</span>
+
+                                        {# Informations de la partition #}
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">
+                                                <a href="{{ path('app_chordsheet_show', {id: songbookChordsheet.chordsheet.id}) }}"
+                                                   class="text-decoration-none">
+                                                    {{ songbookChordsheet.chordsheet.title }}
+                                                </a>
+                                            </h6>
+                                            <small class="text-muted">
+                                                Par {{ songbookChordsheet.chordsheet.user.username }}
+                                                {% if songbookChordsheet.chordsheet.isPublic %}
+                                                    <span class="badge bg-success ms-2">Public</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning ms-2">Privé</span>
+                                                {% endif %}
+                                            </small>
+                                        </div>
+
+                                        {# Date d'ajout #}
+                                        <small class="text-muted me-3">
+                                            Ajouté le {{ songbookChordsheet.addedAt|date('d/m/Y') }}
+                                        </small>
+                                    </div>
+
+                                    {# Actions #}
+                                    <div class="btn-group">
+                                        <a href="{{ path('app_chordsheet_show', {id: songbookChordsheet.chordsheet.id}) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        {# Formulaire de suppression #}
+                                        <form method="post"
+                                              action="{{ path('app_songbook_remove_chordsheet', {
+                                                  id: songbook.id,
+                                                  songbookChordsheetId: songbookChordsheet.id
+                                              }) }}"
+                                              style="display: inline;"
+                                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette partition du recueil ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('remove_chordsheet_' ~ songbook.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {# JavaScript pour le drag & drop #}
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const listElement = document.getElementById('chordsheets-list');
+
+                        // Implémentation simple du drag & drop
+                        let draggedElement = null;
+
+                        listElement.addEventListener('dragstart', function(e) {
+                            if (e.target.closest('.list-group-item')) {
+                                draggedElement = e.target.closest('.list-group-item');
+                                e.dataTransfer.effectAllowed = 'move';
+                                e.dataTransfer.setData('text/html', draggedElement.outerHTML);
+                            }
+                        });
+
+                        listElement.addEventListener('dragover', function(e) {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = 'move';
+                        });
+
+                        listElement.addEventListener('drop', function(e) {
+                            e.preventDefault();
+                            if (draggedElement) {
+                                const targetElement = e.target.closest('.list-group-item');
+                                if (targetElement && targetElement !== draggedElement) {
+                                    const parent = targetElement.parentNode;
+                                    const nextSibling = targetElement.nextSibling;
+                                    parent.insertBefore(draggedElement, nextSibling);
+
+                                    // Sauvegarder le nouvel ordre
+                                    saveNewOrder();
+                                }
+                            }
+                        });
+
+                        // Rendre les éléments draggables
+                        listElement.querySelectorAll('.list-group-item').forEach(item => {
+                            item.setAttribute('draggable', true);
+                        });
+
+                        function saveNewOrder() {
+                            const items = listElement.querySelectorAll('.list-group-item');
+                            const positions = {};
+
+                            items.forEach((item, index) => {
+                                const id = item.getAttribute('data-id');
+                                positions[id] = index + 1;
+                            });
+
+                            // Envoyer les nouvelles positions au serveur
+                            fetch('{{ path('app_songbook_reorder', {id: songbook.id}) }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                },
+                                body: new URLSearchParams({
+                                    '_token': '{{ csrf_token('reorder_' ~ songbook.id) }}',
+                                    'positions': JSON.stringify(positions)
+                                })
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        // Mettre à jour les numéros de position affichés
+                                        items.forEach((item, index) => {
+                                            const badge = item.querySelector('.badge');
+                                            if (badge) {
+                                                badge.textContent = index + 1;
+                                            }
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Erreur lors de la sauvegarde de l\'ordre:', error);
+                                });
+                        }
+                    });
+                </script>
+
+            {% else %}
+                <div class="alert alert-info">
+                    <h5>Aucune partition dans ce recueil</h5>
+                    <p>Commencez par ajouter des partitions à votre recueil.</p>
+                    <a href="{{ path('app_songbook_available_chordsheets', {id: songbook.id}) }}"
+                       class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Ajouter votre première partition
+                    </a>
+                </div>
+            {% endif %}
+
+            {# Actions du songbook #}
+            <div class="d-flex gap-2 mt-4">
+                <a href="{{ path('app_songbook_edit', {id: songbook.id}) }}" class="btn btn-green">
+                    <i class="fas fa-edit"></i> Modifier le recueil
+                </a>
+                <a href="{{ path('app_songbook_index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
+
+
+                {# Formulaire de suppression du songbook #}
+                <form method="post"
+                      action="{{ path('app_songbook_delete', {id: songbook.id}) }}"
+                      style="display: inline;"
+                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer définitivement ce recueil ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ songbook.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Supprimer le recueil
+                    </button>
+                </form>
             </div>
         </div>
     </div>

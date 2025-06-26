@@ -59,7 +59,19 @@
                         <ul class="list-group list-group-flush text-start">
                             <li class="list-group-item">
                                 <strong>Rôle :</strong>
-                                <span class="badge bg-primary">{{ role }}</span>
+                                {% if isAdmin %}
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-crown"></i> {{ role }}
+                                    </span>
+                                {% elseif 'ROLE_MODERATOR' in app.user.roles %}
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-shield-alt"></i> {{ role }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-primary">
+                                        <i class="fas fa-user"></i> {{ role }}
+                                    </span>
+                                {% endif %}
                             </li>
                         </ul>
                     </div>
@@ -71,32 +83,85 @@
                         <a href="{{ path('app_profile_export') }}" class="btn btn-outline-primary">
                             📄 Exporter mes données
                         </a>
-                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
-                            Supprimer mon compte
-                        </button>
+
+                        {% if isAdmin %}
+                            {# Bouton désactivé pour les administrateurs #}
+                            <button class="btn btn-danger" disabled data-bs-toggle="tooltip"
+                                    title="Les administrateurs ne peuvent pas supprimer leur compte. Transmettez d'abord vos privilèges.">
+                                <i class="fas fa-lock"></i> Supprimer mon compte
+                            </button>
+                        {% else %}
+                            {# Bouton normal pour les autres utilisateurs #}
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                                Supprimer mon compte
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if isAdmin %}
+                    {# Message d'information pour les administrateurs #}
+                    <div class="alert alert-info mt-3" role="alert">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-info-circle"></i> Information Administrateur
+                        </h5>
+                        <p class="mb-0">
+                            En tant qu'administrateur, vous ne pouvez pas supprimer votre compte directement.
+                            Cette mesure de sécurité garantit qu'au moins un administrateur reste toujours présent sur la plateforme.
+                        </p>
+                        <hr>
+                        <p class="mb-0">
+                            <strong>Pour supprimer votre compte :</strong> Transmettez d'abord vos privilèges d'administrateur à un autre utilisateur de confiance.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if not isAdmin %}
+        {# Modal de confirmation uniquement si l'utilisateur n'est pas admin #}
+        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Attention !</strong> Cette action est irréversible.
+                        </div>
+                        <p>Êtes-vous absolument sûr de vouloir supprimer votre compte ?</p>
+                        <p class="text-muted small">
+                            Toutes vos données seront anonymisées et vous ne pourrez plus vous connecter.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="post" action="{{ path('app_profile_delete') }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Confirmer la suppression
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                </div>
-                <div class="modal-body">
-                    Êtes-vous sûr de vouloir supprimer votre compte ?
-                </div>
-                <div class="modal-footer">
-                    <form method="post" action="{{ path('app_profile_delete') }}">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete_account') }}">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-danger">Supprimer</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Initialiser les tooltips Bootstrap
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 {% endblock %}

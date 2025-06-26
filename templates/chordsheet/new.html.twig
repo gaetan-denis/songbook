@@ -82,7 +82,7 @@
                 const input = document.getElementById('message');
                 const fileInput = document.getElementById('fileInput');
                 const saveBtn = document.getElementById('saveBtn');
-                const backBtn = document.getElementById('backBtn'); // NOUVEAU
+                const backBtn = document.getElementById('backBtn');
                 const output = document.getElementById('rendered');
 
                 // Fonctions essentielles pour le parser - NE PAS TOUCHER
@@ -230,23 +230,28 @@
                     output.innerHTML = renderChordPro(input.value);
                 });
 
-                // Sauvegarde avec validation côté client et gestion d'erreurs améliorée
+                // Sauvegarde MODIFIÉE - sans alerts
                 saveBtn.addEventListener('click', async () => {
                     const content = input.value.trim();
                     const filename = filenameInput.value.trim();
 
-                    // Validation côté client
+                    // Validation côté client - on garde les validations pour l'UX
                     if (!filename) {
-                        alert("Le titre ne peut pas être vide.");
+                        // On peut garder une validation discrète côté client
                         filenameInput.focus();
+                        filenameInput.classList.add('is-invalid');
                         return;
                     }
 
                     if (!content) {
-                        alert("Le contenu ne peut pas être vide.");
                         input.focus();
+                        input.classList.add('is-invalid');
                         return;
                     }
+
+                    // Retirer les classes d'erreur si validation OK
+                    filenameInput.classList.remove('is-invalid');
+                    input.classList.remove('is-invalid');
 
                     // Désactiver le bouton pendant la sauvegarde
                     saveBtn.disabled = true;
@@ -264,27 +269,22 @@
                         const data = await response.json();
 
                         if (response.ok) {
-                            alert("La partition \"" + data.filename + "\" a été sauvegardée avec succès !");
+                            // Redirection immédiate vers l'index - le message flash sera affiché là-bas
                             window.location.href = '/chordsheet';
                         } else {
-                            // Afficher le message d'erreur spécifique du serveur
-                            const errorMessage = data.error || "Erreur lors de la sauvegarde";
-                            alert(errorMessage);
+                            // En cas d'erreur, on redirige aussi mais le serveur aura mis un message flash d'erreur
+                            window.location.href = '/chordsheet';
                         }
                     } catch (error) {
                         console.error('Erreur:', error);
-                        alert("Erreur de communication avec le serveur");
-                    } finally {
-                        // Réactiver le bouton
-                        saveBtn.disabled = false;
-                        saveBtn.textContent = "Sauvegarder";
+                        // Même en cas d'erreur réseau, on redirige - vous pouvez gérer ça côté serveur
+                        window.location.href = '/chordsheet';
                     }
                 });
 
-                // NOUVEAU : Retour aux partitions
+                // Retour aux partitions
                 backBtn.addEventListener('click', () => {
-                    // Remplacez par votre URL de retour
-                    window.location.href = '/chordsheet/'; // ou votre route
+                    window.location.href = '/chordsheet/';
                 });
 
                 // Rendu initial si il y a déjà du contenu

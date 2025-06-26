@@ -16,28 +16,36 @@ class ChordsheetRepository extends ServiceEntityRepository
         parent::__construct($registry, Chordsheet::class);
     }
 
-    //    /**
-    //     * @return Chordsheet[] Returns an array of Chordsheet objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Trouve les partitions disponibles pour un utilisateur
+     * (ses propres partitions + les partitions publiques)
+     */
+    public function findAvailableForUser($user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.user = :user OR c.isPublic = true')
+            ->setParameter('user', $user)
+            ->orderBy('c.title', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Chordsheet
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * Trouve les partitions disponibles pour un utilisateur avec recherche
+     */
+    public function findAvailableForUserWithSearch($user, string $search = null): array
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.user = :user OR c.isPublic = true')
+            ->setParameter('user', $user);
+
+        if ($search) {
+            $qb->andWhere('c.title LIKE :search OR c.content LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+
+        return $qb->orderBy('c.title', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

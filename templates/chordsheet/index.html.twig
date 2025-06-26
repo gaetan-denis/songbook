@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes Chordsheets{% endblock %}
+{% block title %}Mes Tablatures{% endblock %}
 
 {% block body %}
     <div class="container">
@@ -39,11 +39,11 @@
                             <td>
                                 {% if chordsheet.isPublic %}
                                     <span class="badge bg-success">
-                                        <i class="fas fa-globe me-1"></i> Publique
+                                        <i class="fas fa-globe me-1"></i> Public
                                     </span>
                                 {% else %}
                                     <span class="badge bg-secondary">
-                                        <i class="fas fa-lock me-1"></i> Privée
+                                        <i class="fas fa-lock me-1"></i> Privé
                                     </span>
                                 {% endif %}
                             </td>
@@ -308,18 +308,12 @@
                 });
             });
 
-            // Event listener pour les boutons de publication/dépublication
+            // Event listener pour les boutons de publication/dépublication - MODIFIÉ
             document.querySelectorAll('.toggle-public-btn').forEach(button => {
                 button.addEventListener('click', async () => {
                     const chordsheetId = button.dataset.chordsheetId;
                     const isPublic = button.dataset.isPublic === 'true';
                     const csrfToken = button.dataset.csrfToken;
-
-                    // Confirmation avant action
-                    const action = isPublic ? 'rendre privée' : 'publier';
-                    if (!confirm(`Voulez-vous vraiment ${action} cette partition ?`)) {
-                        return;
-                    }
 
                     // Désactiver le bouton pendant la requête
                     button.disabled = true;
@@ -336,29 +330,14 @@
 
                         const data = await response.json();
 
-                        if (data.success) {
-                            // Recharger la page pour mettre à jour l'affichage
-                            location.reload();
-                        } else {
-                            alert('Erreur: ' + (data.error || 'Une erreur est survenue'));
-                            button.disabled = false;
-                            // Restaurer le texte du bouton
-                            if (isPublic) {
-                                button.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Rendre privée';
-                            } else {
-                                button.innerHTML = '<i class="fas fa-globe me-1"></i> Publier';
-                            }
-                        }
+                        // Qu'il y ait succès ou erreur, on recharge la page
+                        // Le message flash sera affiché par le serveur
+                        location.reload();
+
                     } catch (error) {
                         console.error('Erreur:', error);
-                        alert('Une erreur de communication est survenue');
-                        button.disabled = false;
-                        // Restaurer le texte du bouton
-                        if (isPublic) {
-                            button.innerHTML = '<i class="fas fa-eye-slash me-1"></i> Rendre privée';
-                        } else {
-                            button.innerHTML = '<i class="fas fa-globe me-1"></i> Publier';
-                        }
+                        // Même en cas d'erreur, on recharge - le serveur peut gérer l'erreur
+                        location.reload();
                     }
                 });
             });

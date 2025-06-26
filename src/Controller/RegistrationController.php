@@ -11,9 +11,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 final class RegistrationController extends AbstractController
 {
+    private $params;
+
+    public function __construct(ParameterBagInterface $params)
+    {
+        $this->params = $params;
+    }
     #[Route('/register', name: 'app_register')]
     public function register(
         Request $request,
@@ -25,6 +32,21 @@ final class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
+        // --- INSÉRER LA VÉRIFICATION HCAPTCHA ICI ---
+        if ($form->isSubmitted()) {
+            $hCaptchaResponse = $request->request->get('h-captcha-response');
+            $secret = $this->params->get('HCAPTCHA_SECRET_KEY');
+
+            $response = file_get_contents('https://hcaptcha.com/siteverify?secret=' . $secret . '&response=' . $hCaptchaResponse);
+            $responseKeys = json_decode($response, true);
+
+            if (!$responseKeys['success']) {
+                $this->addFlash('error', 'Le CAPTCHA a échoué. Veuillez réessayer.');
+                return $this->redirectToRoute('app_register');
+            }
+        }
+        // --- FIN DE LA VÉRIFICATION HCAPTCHA ---
+
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupère le mot de passe en clair
             $plainPassword = $form->get('plainPassword')->getData();
@@ -34,15 +56,12 @@ final class RegistrationController extends AbstractController
             $user->setPassword($hashedPassword);
 
             // Attribue un rôle par défaut (si tu as une entité Role)
-            // Ou simplement : $user->setRoles(['ROLE_USER']);
-
             $roleRepository = $entityManager->getRepository(Role::class);
             $defaultRole = $roleRepository->findOneBy(['name' => 'ROLE_USER']);
 
             if ($defaultRole) {
                 $user->setRole($defaultRole);
             } else {
-                // En cas de souci, tu peux lever une exception ou définir un rôle de secours
                 throw new \Exception("Le rôle ROLE_USER n'existe pas en base.");
             }
 
@@ -75,6 +94,8 @@ final class RegistrationController extends AbstractController
 
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
+            'hcaptcha_site_key' => $this->params->get('HCAPTCHA_SITE_KEY'),
         ]);
     }
+
 }
