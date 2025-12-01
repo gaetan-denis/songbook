@@ -1,54 +1,139 @@
-# Songbook
+# Songbook 🎵
 
-## Manuel d'installation
+[![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
+[![Symfony](https://img.shields.io/badge/Symfony-000000?style=flat&logo=symfony&logoColor=white)](https://symfony.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/fr/docs/Web/JavaScript)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
+[![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com/)
 
-1. À partir de la page du [repository](https://github.com/gaetan-denis/songbook), cliquez sur `<> CODE` puis choisissez une méthode pour cloner le [repository](https://github.com/gaetan-denis/songbook) en local (pour l'exemple nous choisirons ici `https://github.com/gaetan-denis/songbook.git`).
+**Songbook** est une application musicale interactive créée comme projet de fin d’études.  
+Elle permet de **créer des songbooks**, **gérer des accords**, et **organiser des setlists** pour les musiciens et passionnés de musique.  
+C’est un projet complet backend + frontend qui illustre mes compétences en PHP/Symfony et JavaScript.
 
-2. En local, ouvrez ensuite le terminal de votre choix, rendez-vous à l'emplacement où vous souhaitez télécharger l'application et exécuter ensuite la commande :
-    ```bash
-    git clone https://github.com/gaetan-denis/songbook.git
-    ```
-3. Téléchargez et installez ensuite les dépendances dans le dossier `vendor`en exécutant la commande :
-    ```bash 
-    composer install
-    ``` 
+---
 
-4. Installez ensuite les dépendances JavaScript nécessaires à Webpack Encore :
-    ```bash
-    npm install
-    ```
+## 📷 Aperçu / Screenshots
 
-5. Lancez ensuite le serveur de développement en exécutant la commande :
-    ```bash
-    npm run dev
-    ```
+### Page d’accueil (sans connexion)
 
-6. Ouvrez ensuite l'application avec l'IDE de votre choix puis configurer le fichier `.env`. Portez une attention toute particulière aux lignes `26` jusque `29` permettant la configuration de votre base de donnée. Pour ce faire, décommentez la ligne concernée et modifiez-la ensuite en fonction de vos paramètres personnels.
-7. Démarrez ensuite le serveur en effectuant la commande :
-    ```bash
-    symfony server:start
-    ```
-## Installation de la base de donnée
+![Page d'accueil](image.png)
+_Landing page de Songbook, accessible sans connexion._
 
-1. Création de la base de donnée
-   ```bash
-   php bin/console doctrine:database:create
-   ```
-2. Exécution des migrations
-   ```bash
-   php bin/console doctrine:migrations:migrate
-   ```
-3. Chargement des fixtures
-   ```bash
-   php bin/console doctrine:fixtures:load
-   ```
-## Crédits :
+### Page de connexion
+
+![Page de connexion](image-1.png)
+_Formulaire de connexion de Songbook, sécurisé avec hCaptcha._
+
+### Création d'une partition
+
+![Création d'une partition](image-5.png)
+_Aperçu de la création d'une partition avec l'écriture au format ChordPro à gaucher et le rendu à droite. Possiblité d'importer directemnt un fichier en local._
+
+### Bibliothèque
+
+![Bibliothèque](image-8.png)
+_Apercu de la bibliothèque permettant à tout utilisateur inscrit de consulter ou d'ajouter les partitions des autres utilisateurs. Un visiteur ne pourra que consulter les partitions._
+
+### Profil
+
+![Profil](image-9.png)
+_Aperçu de la page de profil permettant la mise à jour et l'export de données. La suppression de l'admin est ici impossible sans transmission préalable du rôle._
+
+### Gestion des partitions par l'admin
+
+![Gestion des partitions](image-11.png)
+_Aperçu de la page de gestion des partitions, avec statistiques générales_
+\_\_
+
+## 🚀 Fonctionnalités principales
+
+- Création et gestion de songbooks
+- Gestion des accords et des tablatures
+- Organisation de setlists pour les concerts ou répétitions
+- Interface interactive et responsive
+
+### 🌱 Prochaines améliorations
+
+- Intégration d’éléments multimédias (audio, images)
+
+---
+
+## 🛠️ Technologies utilisées
+
+- **Backend** : PHP / Symfony
+- **Frontend** : JavaScript
+- **Styles** : Bootstrap, SCSS
+- **Base de données** : MySQL
+- **Autres outils** : Composer, Webpack Encore, GitHub
+
+---
+
+## 💻 Installation
+
+### 1️⃣ Cloner le repository
+
+```bash
+git clone https://github.com/gaetan-denis/songbook.git
+```
+
+### 2️⃣ Installer les dépendances PHP
+
+```bash
+composer install
+```
+
+### 3️⃣ Installer les dépendances JavaScript
+
+```bash
+npm install
+```
+
+### 4️⃣ Lancer le serveur de développement
+
+```bash
+npm run dev
+```
+
+### 5️⃣ Configurer la base de données
+
+- Ouvrir le fichier .env et adapter les lignes 26 à 29 selon vos paramètres
+
+- Créer la base de données :
+
+```bash
+php bin/console doctrine:database:create
+```
+
+- Exécuter les migrations :
+
+```bash
+php bin/console doctrine:migrations:migrate
+```
+
+- Charger les fixtures :
+
+```bash
+php bin/console doctrine:fixtures:load
+```
+
+### 6️⃣ Démarrer le serveur Symfony
+
+```bash
+symfony server:start
+```
+
+## 🎨 Crédits
 
 ### Fichier de réinitialisation SCSS
-- **Licence :** MIT
-- **Author :** Fraser Boag
-- **Repository :** https://github.com/fraserboag/sass-reset
 
-### Image de fond :
-- **Artiste :** Charl Durand
-- **Lien :** https://www.pexels.com/fr-fr/photo/main-musicien-sepia-jouer-de-la-musique-15320380/
+- Licence : MIT
+
+- Author : Fraser Boag
+
+- Repository : sass-reset
+
+### Image de fond
+
+- Artiste : Charl Durand
+
+- Lien : Pexels
