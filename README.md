@@ -6,8 +6,7 @@
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com/)
 
-**Songbook** est une application musicale interactive créée comme projet de fin d’études.  
-Elle permet de **créer des songbooks**, **gérer des accords**, et **organiser des setlists** pour les musiciens et passionnés de musique.  
+**Songbook** est une application musicale interactive créée comme projet de fin d’études, permettant aux musiciens de créer, organiser et partager leurs partitions au format ChordPro.
 C’est un projet complet backend + frontend qui illustre mes compétences en PHP/Symfony et JavaScript.
 
 ---
@@ -41,7 +40,7 @@ _Formulaire d'inscription, sécurisé avec hCaptcha._
 ### Création d'une partition
 
 ![Création d'une partition](assets/images/screenshots/screenshot-3.png)
-_Aperçu de la création d'une partition avec l'écriture au format ChordPro à gaucher et le rendu à droite. Possiblité d'importer directemnt un fichier en local._
+_Aperçu de la création d'une partition avec l'écriture au format ChordPro à gauche et le rendu à droite. Possiblité d'importer directement un fichier en local._
 
 ### Bibliothèque
 
