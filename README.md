@@ -25,7 +25,7 @@ Le projet couvre l’ensemble du flux d’une application moderne : backend Symf
 
 - Architecture MVC Symfony avec services dédiés
 
-- Authentification + gestion des rôles (User, Moderator,  Admin)
+- Authentification + gestion des rôles (User, Moderator, Admin)
 
 - CRUD complet : partitions, songbooks, setlists
 
@@ -33,21 +33,21 @@ Le projet couvre l’ensemble du flux d’une application moderne : backend Symf
 
 - Génération dynamique du rendu des partitions
 
-- Utilisation de Doctrine (entités, relations, migrations, fixtures)
+- Export complet des données utilisateur (conformité RGPD)
 
-- Validation des données via les FormTypes Symfony
-
-- Sécurisation via hCaptcha
-
-- Gestion des assets avec Webpack Encore (SCSS, JS)
+- Suppression de compte sécurisée (transfert préalable du rôle Admin)
 
 - Système d’export, import et mise à jour du profil
 
-- Suppression de compte sécurisée avec transfert préalable du rôle Admin
+- Utilisation de Doctrine (entités, relations, migrations, fixtures)
 
-- Opérations réservées à l’Admin et aux Modérateurs (gestion globale des partitions + statistiques)
+- Validation via les FormTypes Symfony
 
-- Export complet des données utilisateur (conformité RGPD)
+- Sécurisation via hCaptcha
+
+- Gestion des assets avec Webpack Encore
+
+- Outils d'administration (statistiques + gestion globale des partitions)
 
 ## Schéma de la base de donnée
 
@@ -126,8 +126,7 @@ erDiagram
         datetime delivered_at
     }
 ```
-💡 Les tables GENRE et TONALITY sont déjà définies en base de données mais ne sont pas encore utilisées. Elles sont prévues pour des évolutions futures du projet.
-
+💡 Les tables `GENRE` et `TONALITY` sont déjà définies dans la base de données mais ne sont pas encore utilisées dans l’application. Elles serviront de fondation à des fonctionnalités futures (classement, filtres, outils musicaux).
 ## 🌱 Prochaines améliorations
 
 - Intégration d’éléments multimédias (audio, images)
@@ -149,12 +148,12 @@ _Formulaire d'inscription, sécurisé avec hCaptcha._
 ### Création d'une partition
 
 ![Création d'une partition](assets/images/screenshots/screenshot-3.png)
-_Aperçu de la création d'une partition avec l'écriture au format ChordPro à gauche et le rendu à droite. Possiblité d'importer directement un fichier en local._
+_Aperçu de la création d'une partition avec l'écriture au format ChordPro à gauche et le rendu à droite. Possibilité d'importer directement un fichier en local._
 
 ### Bibliothèque
 
 ![Bibliothèque](assets/images/screenshots/screenshot-4.png)
-_Apercu de la bibliothèque permettant à tout utilisateur inscrit de consulter ou d'ajouter les partitions des autres utilisateurs. Un visiteur ne pourra que consulter les partitions._
+_Aperçu de la bibliothèque permettant à tout utilisateur inscrit de consulter ou d'ajouter les partitions des autres utilisateurs. Un visiteur ne pourra que consulter les partitions._
 
 ### Profil
 
