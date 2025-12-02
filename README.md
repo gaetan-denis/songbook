@@ -12,21 +12,34 @@ C’est un projet complet backend + frontend qui illustre mes compétences en PH
 
 ---
 
+## 🚀 Fonctionnalités principales
+
+- Création et gestion de songbooks
+- Gestion des accords et des tablatures
+- Organisation de setlists pour les concerts ou répétitions
+- Interface interactive et responsive
+
+### 🌱 Prochaines améliorations
+
+- Intégration d’éléments multimédias (audio, images)
+
+---
+
 ## 📷 Aperçu / Screenshots
 
 ### Page d’accueil (sans connexion)
 
 ![Page d'accueil](assets/images/screenshots/screenshot-1.png)
-_Landing page de Songbook, accessible sans connexion._
+_Page d'accueil, accessible sans connexion._
 
 ### Page d'inscription
 
 ![Page d'inscription'](assets/images/screenshots/screenshot-2.png)
-_Formulaire de connexion de Songbook, sécurisé avec hCaptcha._
+_Formulaire d'inscription, sécurisé avec hCaptcha._
 
 ### Création d'une partition
 
-![Création d'une partition](image-5.png)
+![Création d'une partition](assets/images/screenshots/screenshot-3.png)
 _Aperçu de la création d'une partition avec l'écriture au format ChordPro à gaucher et le rendu à droite. Possiblité d'importer directemnt un fichier en local._
 
 ### Bibliothèque
@@ -43,20 +56,6 @@ _Aperçu de la page de profil permettant la mise à jour et l'export de données
 
 ![Gestion des partitions](image-11.png)
 _Aperçu de la page de gestion des partitions, avec statistiques générales_
-\_\_
-
-## 🚀 Fonctionnalités principales
-
-- Création et gestion de songbooks
-- Gestion des accords et des tablatures
-- Organisation de setlists pour les concerts ou répétitions
-- Interface interactive et responsive
-
-### 🌱 Prochaines améliorations
-
-- Intégration d’éléments multimédias (audio, images)
-
----
 
 ## 🛠️ Technologies utilisées
 
