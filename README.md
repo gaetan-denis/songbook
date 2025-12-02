@@ -1,4 +1,4 @@
-# Songbook 🎵
+# Songbook
 
 [![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat&logo=php&logoColor=white)](https://www.php.net/)
 [![Symfony](https://img.shields.io/badge/Symfony-000000?style=flat&logo=symfony&logoColor=white)](https://symfony.com/)
