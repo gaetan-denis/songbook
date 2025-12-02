@@ -189,31 +189,31 @@ _Aperçu de la page de gestion des partitions, avec statistiques générales_
 
 ## Installation
 
-### 1️⃣ Cloner le repository
+### 1. Cloner le repository
 
 ```bash
 git clone https://github.com/gaetan-denis/songbook.git
 ```
 
-### 2️⃣ Installer les dépendances PHP
+### 2. Installer les dépendances PHP
 
 ```bash
 composer install
 ```
 
-### 3️⃣ Installer les dépendances JavaScript
+### 3. Installer les dépendances JavaScript
 
 ```bash
 npm install
 ```
 
-### 4️⃣ Lancer le serveur de développement
+### 4. Lancer le serveur de développement
 
 ```bash
 npm run dev
 ```
 
-### 5️⃣ Configurer la base de données
+### 5. Configurer la base de données
 
 - Ouvrir le fichier .env et adapter les lignes 26 à 29 selon vos paramètres
 
@@ -235,7 +235,7 @@ php bin/console doctrine:migrations:migrate
 php bin/console doctrine:fixtures:load
 ```
 
-### 6️⃣ Démarrer le serveur Symfony
+### 6. Démarrer le serveur Symfony
 
 ```bash
 symfony server:start
