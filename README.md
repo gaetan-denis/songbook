@@ -49,7 +49,7 @@ Le projet couvre l’ensemble du flux d’une application moderne : backend Symf
 
 - Outils d'administration (statistiques + gestion globale des partitions)
 
-## Schéma de la base de donnée
+## 🗃️ Schéma de la base de données
 
 ```mermaid
 erDiagram
