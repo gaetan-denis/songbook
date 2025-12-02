@@ -16,12 +16,12 @@ C’est un projet complet backend + frontend qui illustre mes compétences en PH
 
 ### Page d’accueil (sans connexion)
 
-![Page d'accueil](image.png)
+![Page d'accueil](assets/images/screenshots/screenshot-1.png)
 _Landing page de Songbook, accessible sans connexion._
 
-### Page de connexion
+### Page d'inscription
 
-![Page de connexion](image-1.png)
+![Page d'inscription'](assets/images/screenshots/screenshot-2.png)
 _Formulaire de connexion de Songbook, sécurisé avec hCaptcha._
 
 ### Création d'une partition
