@@ -14,6 +14,7 @@ C’est un projet complet backend + frontend qui illustre mes compétences en PH
 
 ## 🚀 Fonctionnalités principales
 
+- Gestion des partitions au format **ChordPro**, pour un rendu clair et compatible avec les outils de musique
 - Création et gestion de songbooks
 - Gestion des accords et des tablatures
 - Organisation de setlists pour les concerts ou répétitions
@@ -44,17 +45,17 @@ _Aperçu de la création d'une partition avec l'écriture au format ChordPro à 
 
 ### Bibliothèque
 
-![Bibliothèque](image-8.png)
+![Bibliothèque](assets/images/screenshots/screenshot-4.png)
 _Apercu de la bibliothèque permettant à tout utilisateur inscrit de consulter ou d'ajouter les partitions des autres utilisateurs. Un visiteur ne pourra que consulter les partitions._
 
 ### Profil
 
-![Profil](image-9.png)
+![Profil](assets/images/screenshots/screenshot-5.png)
 _Aperçu de la page de profil permettant la mise à jour et l'export de données. La suppression de l'admin est ici impossible sans transmission préalable du rôle._
 
 ### Gestion des partitions par l'admin
 
-![Gestion des partitions](image-11.png)
+![Gestion des partitions](assets/images/screenshots/screenshot-6.png)
 _Aperçu de la page de gestion des partitions, avec statistiques générales_
 
 ## 🛠️ Technologies utilisées
