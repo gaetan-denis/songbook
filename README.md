@@ -18,8 +18,9 @@
 - [Installation](#installation)
 - [Crédits](#crédits)
 
-**Songbook** est une application musicale interactive créée comme projet de fin d’études, permettant aux musiciens de créer, organiser et partager leurs partitions au format ChordPro.
+**Songbook** est une application musicale interactive créée comme projet de fin d’études, permettant aux musiciens de gérer facilement leurs partitions et recueils, de collaborer avec d’autres musiciens et de préparer leurs concerts, le tout via une interface moderne et responsive.
 C’est un projet complet backend + frontend qui illustre mes compétences en PHP/Symfony et JavaScript.
+
 
 Le projet couvre l’ensemble du flux d’une application moderne : backend Symfony, gestion de rôles, upload de fichiers, interface JavaScript dynamique, système de partitions et outils d’administration.
 
