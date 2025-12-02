@@ -33,7 +33,7 @@ Le projet couvre l’ensemble du flux d’une application moderne : backend Symf
 - Organisation de setlists pour les concerts ou répétitions
 - Interface interactive et responsive
 
-## 🔧 Résumé technique
+## Résumé technique
 
 - Architecture MVC Symfony avec services dédiés
 
@@ -61,7 +61,7 @@ Le projet couvre l’ensemble du flux d’une application moderne : backend Symf
 
 - Outils d'administration (statistiques + gestion globale des partitions)
 
-## 🗃️ Schéma de la base de données
+## Schéma de la base de données
 
 ```mermaid
 erDiagram
@@ -138,14 +138,14 @@ erDiagram
         datetime delivered_at
     }
 ```
-💡 Les tables `GENRE` et `TONALITY` sont déjà définies dans la base de données mais ne sont pas encore utilisées dans l’application. Elles serviront de fondation à des fonctionnalités futures (classement, filtres, outils musicaux).
-## 🌱 Prochaines améliorations
+**Notes** Les tables `GENRE` et `TONALITY` sont déjà définies dans la base de données mais ne sont pas encore utilisées dans l’application. Elles serviront de fondation à des fonctionnalités futures (classement, filtres, outils musicaux).
+## Prochaines améliorations
 
 - Intégration d’éléments multimédias (audio, images)
 
 ---
 
-## 📷 Aperçu / Screenshots
+## Aperçu / Screenshots
 
 ### Page d’accueil (sans connexion)
 
@@ -177,7 +177,7 @@ _Aperçu de la page de profil permettant la mise à jour et l'export de données
 ![Gestion des partitions](assets/images/screenshots/screenshot-6.png)
 _Aperçu de la page de gestion des partitions, avec statistiques générales_
 
-## 🛠️ Technologies utilisées
+## Technologies utilisées
 
 - **Backend** : PHP / Symfony
 - **Frontend** : JavaScript
@@ -187,7 +187,7 @@ _Aperçu de la page de gestion des partitions, avec statistiques générales_
 
 ---
 
-## 💻 Installation
+## Installation
 
 ### 1️⃣ Cloner le repository
 
@@ -241,7 +241,7 @@ php bin/console doctrine:fixtures:load
 symfony server:start
 ```
 
-## 🎨 Crédits
+## Crédits
 
 ### Fichier de réinitialisation SCSS
 
