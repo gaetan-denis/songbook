@@ -19,7 +19,35 @@ C’est un projet complet backend + frontend qui illustre mes compétences en PH
 - Organisation de setlists pour les concerts ou répétitions
 - Interface interactive et responsive
 
-### 🌱 Prochaines améliorations
+## 🔧 Résumé technique
+
+- Architecture MVC Symfony avec services dédiés
+
+- Authentification + gestion des rôles (User, Moderator,  Admin)
+
+- CRUD complet : partitions, songbooks, setlists
+
+- Upload et parsing de fichiers ChordPro
+
+- Génération dynamique du rendu des partitions
+
+- Utilisation de Doctrine (entités, relations, migrations, fixtures)
+
+- Validation des données via les FormTypes Symfony
+
+- Sécurisation via hCaptcha
+
+- Gestion des assets avec Webpack Encore (SCSS, JS)
+
+- Système d’export, import et mise à jour du profil
+
+- Suppression de compte sécurisée avec transfert préalable du rôle Admin
+
+- Opérations réservées à l’Admin et aux Modérateurs (gestion globale des partitions + statistiques)
+
+- Export complet des données utilisateur (conformité RGPD)
+
+## 🌱 Prochaines améliorations
 
 - Intégration d’éléments multimédias (audio, images)
 
