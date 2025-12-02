@@ -139,9 +139,14 @@ erDiagram
     }
 ```
 **Notes** Les tables `GENRE` et `TONALITY` sont déjà définies dans la base de données mais ne sont pas encore utilisées dans l’application. Elles serviront de fondation à des fonctionnalités futures (classement, filtres, outils musicaux).
+
 ## Prochaines améliorations
 
-- Intégration d’éléments multimédias (audio, images)
+- Intégration d’éléments multimédias (audio, images) pour enrichir les partitions
+
+- Association d’une partition à un genre musical et à une tonalité, pour faciliter le classement et la recherche
+
+- Gestion des instruments de l’utilisateur, avec possibilité de les lier à un songbook et de filtrer les partitions selon les instruments disponibles, utile pour les répétitions ou concerts
 
 ---
 
