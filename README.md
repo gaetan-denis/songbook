@@ -9,14 +9,14 @@
 
 ## Table des matières
 
-- [Fonctionnalités principales](#-fonctionnalités-principales)
-- [Résumé technique](#-résumé-technique)
-- [Schéma de la base de données](#-schéma-de-la-base-de-données)
-- [Prochaines améliorations](#-prochaines-améliorations)
-- [Aperçu / Screenshots](#-aperçu--screenshots)
-- [Technologies utilisées](#-technologies-utilisées)
-- [Installation](#-installation)
-- [Crédits](#-crédits)
+- [Fonctionnalités principales](#fonctionnalités-principales)
+- [Résumé technique](#résumé-technique)
+- [Schéma de la base de données](#schéma-de-la-base-de-données)
+- [Prochaines améliorations](#prochaines-améliorations)
+- [Aperçu / Screenshots](#aperçu--screenshots)
+- [Technologies utilisées](#technologies-utilisées)
+- [Installation](#installation)
+- [Crédits](#crédits)
 
 **Songbook** est une application musicale interactive créée comme projet de fin d’études, permettant aux musiciens de créer, organiser et partager leurs partitions au format ChordPro.
 C’est un projet complet backend + frontend qui illustre mes compétences en PHP/Symfony et JavaScript.
