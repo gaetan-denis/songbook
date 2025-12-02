@@ -25,7 +25,7 @@ Le projet couvre l’ensemble du flux d’une application moderne : backend Symf
 
 ---
 
-## 🚀 Fonctionnalités principales
+## Fonctionnalités principales
 
 - Gestion des partitions au format **ChordPro**, pour un rendu clair et compatible avec les outils de musique
 - Création et gestion de songbooks
