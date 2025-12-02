@@ -133,6 +133,8 @@ symfony server:start
 
 ### Image de fond
 
-- Artiste : Charl Durand
+- Two Grayscale Acoustic Guitars
 
-- Lien : Pexels
+- Image libre de droit (CCO)
+
+- Lien : [Pexels](https://www.pexels.com/photo/two-grayscale-acoustic-guitars-290660/)
