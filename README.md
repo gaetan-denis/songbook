@@ -49,6 +49,85 @@ Le projet couvre l’ensemble du flux d’une application moderne : backend Symf
 
 - Export complet des données utilisateur (conformité RGPD)
 
+## Schéma de la base de donnée
+
+```mermaid
+erDiagram
+
+    USER ||--o{ CHORDSHEET : "creates"
+    USER ||--o{ SONGBOOK : "owns"
+    USER }o--|| ROLE : "has"
+
+    SONGBOOK ||--o{ SONGBOOK_CHORDSHEET : "links"
+    CHORDSHEET ||--o{ SONGBOOK_CHORDSHEET : "linked in"
+
+    %% Tables
+
+    USER {
+        int id PK
+        string email
+        string password
+        datetime created_at
+    }
+
+    ROLE {
+        int id PK
+        string name
+        string description
+    }
+
+    CHORDSHEET {
+        int id PK
+        int user_id FK
+        string title
+        longtext content
+        datetime created_at
+        boolean is_public
+        datetime published_at
+    }
+
+    SONGBOOK {
+        int id PK
+        int user_id FK
+        string title
+        string description
+        datetime created_at
+    }
+
+    SONGBOOK_CHORDSHEET {
+        int id PK
+        int songbook_id FK
+        int chordsheet_id FK
+        datetime added_at
+        int position
+    }
+
+    GENRE {
+        int id PK
+        string name
+        string description
+    }
+
+    TONALITY {
+        int id PK
+        string name
+        string description
+        string type
+    }
+
+    %% (Optional table used by Symfony Messenger)
+    MESSENGER_MESSAGES {
+        bigint id PK
+        longtext body
+        longtext headers
+        string queue_name
+        datetime created_at
+        datetime available_at
+        datetime delivered_at
+    }
+```
+💡 Les tables GENRE et TONALITY sont déjà définies en base de données mais ne sont pas encore utilisées. Elles sont prévues pour des évolutions futures du projet.
+
 ## 🌱 Prochaines améliorations
 
 - Intégration d’éléments multimédias (audio, images)
