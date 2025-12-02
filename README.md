@@ -11,10 +11,10 @@
 
 - [Fonctionnalités principales](#-fonctionnalités-principales)
 - [Résumé technique](#-résumé-technique)
-- [Schéma de la base de données](#schéma-de-la-base-de-données)
+- [Schéma de la base de données](#-schéma-de-la-base-de-données)
 - [Prochaines améliorations](#-prochaines-améliorations)
 - [Aperçu / Screenshots](#-aperçu--screenshots)
-- [Technologies utilisées](#technologies-utilisées)
+- [Technologies utilisées](#-technologies-utilisées)
 - [Installation](#-installation)
 - [Crédits](#-crédits)
 
