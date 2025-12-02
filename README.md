@@ -157,7 +157,7 @@ symfony server:start
 
 - Author : Fraser Boag
 
-- Repository : sass-reset
+- Repository : [sass-reset](https://github.com/fraserboag/sass-reset)
 
 ### Image de fond
 
