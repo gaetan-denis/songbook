@@ -9,6 +9,8 @@
 
 **Langues:** [🇬🇧 English](README.md) | [🇫🇷 Français](README_FR.md)
 
+🇳🇱 *Une version néerlandaise sera disponible prochainement.*
+
 ## Table des matières
 
 - [Fonctionnalités principales](#fonctionnalités-principales)
