@@ -6,7 +6,7 @@
 [![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Languages:** [🇬🇧 English](current) | [🇫🇷 Français](README_FR.md)
+**Languages:** [🇬🇧 English](README.md) | [🇫🇷 Français](README_FR.md)
 
 ## Table of Contents
 
