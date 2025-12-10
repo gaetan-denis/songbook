@@ -8,6 +8,8 @@
 
 **Languages:** [🇬🇧 English](README.md) | [🇫🇷 Français](README_FR.md)
 
+🇳🇱 *A Dutch version will be available in the future.*
+
 ## Table of Contents
 
 - [Key Features](#key-features)
